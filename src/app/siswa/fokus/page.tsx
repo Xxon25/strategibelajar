@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { requireStudent } from '@/lib/session';
 import { studentData } from '@/lib/data';
 import { saveFocus } from '@/app/actions';

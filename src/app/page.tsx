@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import Link from 'next/link';
 import { getStudent } from '@/lib/session';
 import { admin } from '@/lib/supabase-admin';

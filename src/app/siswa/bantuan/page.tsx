@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { requireStudent } from '@/lib/session';
 import { studentData, slotsForCode } from '@/lib/data';
 import { saveShare, requestConsult, logoutStudent, deleteMyData } from '@/app/actions';
