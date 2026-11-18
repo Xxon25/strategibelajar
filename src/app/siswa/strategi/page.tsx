@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic'
+import Link from 'next/link';
 import { requireStudent } from '@/lib/session';
 import { studentData } from '@/lib/data';
 import { admin } from '@/lib/supabase-admin';
@@ -28,11 +29,13 @@ export default async function Strategi({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      <div style={{ background: 'var(--grad)', borderRadius: 'var(--r-lg)', padding: '20px 22px' }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.65)' }}>Pelaksanaan</span>
-        <h2 style={{ color: '#fff', margin: '4px 0 0', fontSize: 22 }}>Latihan mengingat kembali.</h2>
-        <p style={{ color: 'rgba(255,255,255,.75)', margin: '6px 0 0', fontSize: 14, lineHeight: 1.6 }}>
-          Pelajari strategi yang terbukti efektif, lalu uji pemahamanmu.
+      <div style={{ background: 'var(--grad)', borderRadius: 'var(--r-lg)', padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.65)' }}>
+          ⚡ Pelaksanaan · Langkah 1 dari 2
+        </span>
+        <h2 style={{ color: '#fff', margin: 0, fontSize: 24 }}>Latihan mengingat kembali.</h2>
+        <p style={{ color: 'rgba(255,255,255,.78)', margin: 0, fontSize: 15, lineHeight: 1.6, maxWidth: 540 }}>
+          Pelajari strategi belajar yang terbukti efektif secara ilmiah, pilih strategi untuk minggu ini, lalu uji pemahamanmu lewat kuis singkat.
         </p>
       </div>
 
@@ -85,6 +88,15 @@ export default async function Strategi({ searchParams }: { searchParams: Promise
           </div>
         </div>
         <Quiz last={quiz} />
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+        <Link href="/siswa/waktu" className="btn ghost" style={{ width: 'auto', minHeight: 40, padding: '8px 16px', fontSize: 13 }}>
+          ← Sebelumnya: Atur Waktu
+        </Link>
+        <Link href="/siswa/fokus" className="btn ghost" style={{ width: 'auto', minHeight: 40, padding: '8px 16px', fontSize: 13 }}>
+          Langkah Berikutnya: Fokus Belajar →
+        </Link>
       </div>
     </>
   );

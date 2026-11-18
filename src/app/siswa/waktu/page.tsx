@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic'
+import Link from 'next/link';
 import { requireStudent } from '@/lib/session';
 import { studentData } from '@/lib/data';
 import { saveSchedule } from '@/app/actions';
@@ -19,11 +20,13 @@ export default async function Waktu({ searchParams }: { searchParams: Promise<{ 
 
   return (
     <>
-      <div style={{ background: 'var(--grad)', borderRadius: 'var(--r-lg)', padding: '20px 22px' }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.65)' }}>Perencanaan</span>
-        <h2 style={{ color: '#fff', margin: '4px 0 0', fontSize: 22 }}>Jadwal ulang bertahap.</h2>
-        <p style={{ color: 'rgba(255,255,255,.75)', margin: '6px 0 0', fontSize: 14, lineHeight: 1.6 }}>
-          Mengulang dengan jeda lebih efektif dari belajar sekaligus menjelang ujian.
+      <div style={{ background: 'var(--grad)', borderRadius: 'var(--r-lg)', padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.65)' }}>
+          🗺️ Perencanaan · Langkah 3 dari 3
+        </span>
+        <h2 style={{ color: '#fff', margin: 0, fontSize: 24 }}>Jadwal ulang bertahap.</h2>
+        <p style={{ color: 'rgba(255,255,255,.78)', margin: 0, fontSize: 15, lineHeight: 1.6, maxWidth: 540 }}>
+          Mengulang materi dengan jeda (Hari ke-1, 3, 7, dan 14) terbukti jauh lebih efektif daripada belajar sekaligus semalaman menjelang ujian.
         </p>
       </div>
 
@@ -76,6 +79,15 @@ export default async function Waktu({ searchParams }: { searchParams: Promise<{ 
           <p className="small no-print">Tidak ada internet? Cetak atau salin ke buku catatan.</p>
         </div>
       )}
+
+      <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+        <Link href="/siswa/tujuan" className="btn ghost" style={{ width: 'auto', minHeight: 40, padding: '8px 16px', fontSize: 13 }}>
+          ← Sebelumnya: Tujuan
+        </Link>
+        <Link href="/siswa/strategi" className="btn ghost" style={{ width: 'auto', minHeight: 40, padding: '8px 16px', fontSize: 13 }}>
+          Lanjut ke Pelaksanaan: Strategi Belajar →
+        </Link>
+      </div>
     </>
   );
 }

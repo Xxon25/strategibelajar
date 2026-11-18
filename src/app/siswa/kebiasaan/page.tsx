@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic'
+import Link from 'next/link';
 import { requireStudent } from '@/lib/session';
 import { studentData } from '@/lib/data';
 import { saveHabits } from '@/app/actions';
@@ -124,8 +125,17 @@ export default async function Kebiasaan({ searchParams }: { searchParams: Promis
           </div>
         </div>
 
-        <Submit>Simpan pilihan →</Submit>
+        <Submit>💾 Simpan Pilihan Kebiasaan</Submit>
       </form>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+        <Link href="/siswa" className="btn ghost" style={{ width: 'auto', minHeight: 40, padding: '8px 16px', fontSize: 13 }}>
+          ← Beranda Siswa
+        </Link>
+        <Link href="/siswa/tujuan" className="btn ghost" style={{ width: 'auto', minHeight: 40, padding: '8px 16px', fontSize: 13 }}>
+          Langkah Berikutnya: Tetapkan Tujuan →
+        </Link>
+      </div>
     </>
   );
 }

@@ -5,6 +5,7 @@ import { admin } from '@/lib/supabase-admin';
 import { BARRIER, CLASSES, STATUSES, QUIZ } from '@/lib/constants';
 import { todayJakarta } from '@/lib/util';
 import { logoutGuru, setRequestStatus, newCode, toggleCode, addSlot, toggleSlot } from '@/app/guru-actions';
+import { exitPreview } from '@/app/admin-actions';
 import Submit from '@/components/Submit';
 import CopyButton from '@/components/CopyButton';
 
@@ -89,6 +90,33 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
 
   return (
     <div className="app wide">
+      {/* ── Banner Preview Admin ── */}
+      {g.is_admin_preview && (
+        <div style={{
+          background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+          color: '#fff',
+          padding: '10px max(32px, calc((100% - 1200px)/2))',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10,
+          fontSize: 13, fontWeight: 600,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span>👁️</span>
+            <span><b>Mode Preview Admin</b> — Sedang melihat View Guru BK: <b>{g.name}</b> ({g.school_name})</span>
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <Link href="/admin?tab=view" style={{ padding: '5px 12px', borderRadius: 8, background: 'rgba(255,255,255,.18)', color: '#fff', fontWeight: 700, fontSize: 12, textDecoration: 'none' }}>
+              🔄 Ganti View
+            </Link>
+            <form action={exitPreview}>
+              <input type="hidden" name="to" value="/admin" />
+              <button type="submit" style={{ padding: '5px 12px', borderRadius: 8, background: '#fff', color: '#4f46e5', fontWeight: 800, fontSize: 12, cursor: 'pointer' }}>
+                ← Kembali ke Panel Admin
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* ── Topbar ── */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,

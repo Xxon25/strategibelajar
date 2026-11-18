@@ -6,6 +6,8 @@ import { admin } from './supabase-admin';
 import { supabaseAuth } from './supabase-server';
 
 export const STUDENT_COOKIE = 'rsb_student';
+export const PREVIEW_STUDENT_COOKIE = 'rsb_preview_student';
+export const PREVIEW_GURU_COOKIE = 'rsb_preview_guru';
 export const hash = (t: string) => createHash('sha256').update(t).digest('hex');
 
 export type Student = {
@@ -16,11 +18,26 @@ export type Student = {
   consent_at: string | null;
   share_summary: boolean;
   include_reflection: boolean;
+  is_admin_preview?: boolean;
 };
 
 export async function getStudent(): Promise<Student | null> {
   try {
-    const token = (await cookies()).get(STUDENT_COOKIE)?.value;
+    const store = await cookies();
+    const previewId = store.get(PREVIEW_STUDENT_COOKIE)?.value;
+    if (previewId) {
+      const a = await getAdmin();
+      if (a) {
+        const { data } = await admin()
+          .from('students')
+          .select('id,nickname,class,school_code,consent_at,share_summary,include_reflection')
+          .eq('id', previewId)
+          .maybeSingle();
+        if (data) return { ...(data as Student), is_admin_preview: true };
+      }
+    }
+
+    const token = store.get(STUDENT_COOKIE)?.value;
     if (!token) return null;
     const { data, error } = await admin()
       .from('students')
@@ -45,7 +62,7 @@ export async function requireStudent(opts?: { consent?: boolean }): Promise<Stud
   return s;
 }
 
-export type Guru = { user_id: string; name: string; school_name: string };
+export type Guru = { user_id: string; name: string; school_name: string; is_admin_preview?: boolean };
 
 export async function getGuru(): Promise<Guru | null> {
   try {
@@ -60,7 +77,22 @@ export async function getGuru(): Promise<Guru | null> {
       console.error('[getGuru] Supabase error:', error.message);
       return null;
     }
-    return (data as Guru | null) ?? null;
+    if (data) return data as Guru;
+
+    // Jika yang login adalah Admin, izinkan melihat View Guru BK (berdasarkan cookie preview atau guru pertama)
+    const { data: adm } = await admin().from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
+    if (adm) {
+      const store = await cookies();
+      const previewGuruId = store.get(PREVIEW_GURU_COOKIE)?.value;
+      if (previewGuruId) {
+        const { data: cg } = await admin().from('counselors').select('user_id,name,school_name').eq('user_id', previewGuruId).maybeSingle();
+        if (cg) return { ...(cg as Guru), is_admin_preview: true };
+      }
+      const { data: firstGuru } = await admin().from('counselors').select('user_id,name,school_name').order('created_at', { ascending: false }).limit(1).maybeSingle();
+      if (firstGuru) return { ...(firstGuru as Guru), is_admin_preview: true };
+    }
+
+    return null;
   } catch (err) {
     console.error('[getGuru] Unexpected error:', err);
     return null;

@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic'
+import Link from 'next/link';
 import { requireStudent } from '@/lib/session';
 import { studentData } from '@/lib/data';
 import { saveFocus } from '@/app/actions';
@@ -68,9 +69,18 @@ export default async function Fokus({ searchParams }: { searchParams: Promise<{ 
               defaultValue={plan.focus_tools} placeholder="Contoh: Buku catatan, pulpen, air minum" />
           </div>
         </div>
-        <Submit>Simpan rencana fokus →</Submit>
+        <Submit>💾 Simpan Rencana Fokus</Submit>
         <p className="small">Gunakan contoh umum, bukan data pribadi.</p>
       </form>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+        <Link href="/siswa/strategi" className="btn ghost" style={{ width: 'auto', minHeight: 40, padding: '8px 16px', fontSize: 13 }}>
+          ← Sebelumnya: Strategi Belajar
+        </Link>
+        <Link href="/siswa/refleksi" className="btn ghost" style={{ width: 'auto', minHeight: 40, padding: '8px 16px', fontSize: 13 }}>
+          Lanjut ke Refleksi Mingguan →
+        </Link>
+      </div>
     </>
   );
 }
