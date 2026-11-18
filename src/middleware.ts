@@ -6,17 +6,21 @@ export async function middleware(req: NextRequest) {
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   let res = NextResponse.next({ request: req });
   if (!url || !anon) return res;
-  const sb = createServerClient(url, anon, {
-    cookies: {
-      getAll: () => req.cookies.getAll(),
-      setAll(list: Array<{ name: string; value: string; options: CookieOptions }>) {
-        list.forEach(({ name, value }) => req.cookies.set(name, value));
-        res = NextResponse.next({ request: req });
-        list.forEach(({ name, value, options }) => res.cookies.set(name, value, options));
+  try {
+    const sb = createServerClient(url, anon, {
+      cookies: {
+        getAll: () => req.cookies.getAll(),
+        setAll(list: Array<{ name: string; value: string; options: CookieOptions }>) {
+          list.forEach(({ name, value }) => req.cookies.set(name, value));
+          res = NextResponse.next({ request: req });
+          list.forEach(({ name, value, options }) => res.cookies.set(name, value, options));
+        },
       },
-    },
-  });
-  await sb.auth.getUser();
+    });
+    await sb.auth.getUser();
+  } catch (err) {
+    console.error('[middleware] Gagal menyegarkan sesi Supabase:', err);
+  }
   return res;
 }
 

@@ -17,30 +17,47 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
   const tab = sp.tab === 'konsul' || sp.tab === 'kode' || sp.tab === 'jadwal' ? sp.tab : 'siswa';
   const sb = admin();
 
-  const { data: codes } = await sb.from('school_codes').select('*').eq('owner_id', g.user_id).order('created_at', { ascending: false });
-  const codeList = (codes ?? []).map((c) => c.code as string);
-  const { data: studs } = codeList.length
-    ? await sb.from('students').select('id,nickname,class,share_summary,include_reflection,consent_at').in('school_code', codeList).order('created_at', { ascending: false })
-    : { data: [] as Array<{ id: string; nickname: string; class: string; share_summary: boolean; include_reflection: boolean; consent_at: string | null }> };
-  const students = studs ?? [];
-  const ids = students.map((s) => s.id);
-  const monthStart = todayJakarta().slice(0, 8) + '01';
+  let codes: Array<{ code: string; active: boolean; note: string }> = [];
+  let students: Array<{ id: string; nickname: string; class: string; share_summary: boolean; include_reflection: boolean; consent_at: string | null }> = [];
+  let reflData: Refl[] = [];
+  let quizData: Array<{ student_id: string; score: number; total: number }> = [];
+  let daysData: Array<{ student_id: string }> = [];
+  let requests: Array<{ id: string; student_id: string; slot_label: string; status: string }> = [];
+  let slotsData: Array<{ id: string; label: string; active: boolean }> = [];
 
-  const [reflRes, quizRes, daysRes, reqRes, slotRes] = await Promise.all([
-    ids.length ? sb.from('reflections').select('student_id,r1,r2,r3,barrier,support_flag,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
-    ids.length ? sb.from('quiz_attempts').select('student_id,score,total,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
-    ids.length ? sb.from('practice_days').select('student_id,day').in('student_id', ids).gte('day', monthStart) : { data: [] },
-    ids.length ? sb.from('consult_requests').select('id,student_id,slot_label,status,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
-    sb.from('consult_slots').select('*').eq('owner_id', g.user_id).order('created_at'),
-  ]);
+  try {
+    const { data: codesRes } = await sb.from('school_codes').select('*').eq('owner_id', g.user_id).order('created_at', { ascending: false });
+    codes = (codesRes ?? []) as typeof codes;
+    const codeList = codes.map((c) => c.code);
+    const { data: studs } = codeList.length
+      ? await sb.from('students').select('id,nickname,class,share_summary,include_reflection,consent_at').in('school_code', codeList).order('created_at', { ascending: false })
+      : { data: [] as typeof students };
+    students = studs ?? [];
+    const ids = students.map((s) => s.id);
+    const monthStart = todayJakarta().slice(0, 8) + '01';
+
+    const [reflRes, quizRes, daysRes, reqRes, slotRes] = await Promise.all([
+      ids.length ? sb.from('reflections').select('student_id,r1,r2,r3,barrier,support_flag,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
+      ids.length ? sb.from('quiz_attempts').select('student_id,score,total,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
+      ids.length ? sb.from('practice_days').select('student_id,day').in('student_id', ids).gte('day', monthStart) : { data: [] },
+      ids.length ? sb.from('consult_requests').select('id,student_id,slot_label,status,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
+      sb.from('consult_slots').select('*').eq('owner_id', g.user_id).order('created_at'),
+    ]);
+    reflData = (reflRes.data ?? []) as Refl[];
+    quizData = (quizRes.data ?? []) as typeof quizData;
+    daysData = (daysRes.data ?? []) as typeof daysData;
+    requests = (reqRes.data ?? []) as typeof requests;
+    slotsData = (slotRes.data ?? []) as typeof slotsData;
+  } catch (err) {
+    console.error('[GuruPage] Gagal memuat data dashboard guru:', err);
+  }
 
   const lastRefl = new Map<string, Refl>();
-  for (const r of (reflRes.data ?? []) as Refl[]) if (!lastRefl.has(r.student_id)) lastRefl.set(r.student_id, r);
+  for (const r of reflData) if (!lastRefl.has(r.student_id)) lastRefl.set(r.student_id, r);
   const lastQuiz = new Map<string, { score: number; total: number }>();
-  for (const q of (quizRes.data ?? []) as Array<{ student_id: string; score: number; total: number }>) if (!lastQuiz.has(q.student_id)) lastQuiz.set(q.student_id, q);
+  for (const q of quizData) if (!lastQuiz.has(q.student_id)) lastQuiz.set(q.student_id, q);
   const dayCount = new Map<string, number>();
-  for (const d of (daysRes.data ?? []) as Array<{ student_id: string }>) dayCount.set(d.student_id, (dayCount.get(d.student_id) ?? 0) + 1);
-  const requests = (reqRes.data ?? []) as Array<{ id: string; student_id: string; slot_label: string; status: string }>;
+  for (const d of daysData) dayCount.set(d.student_id, (dayCount.get(d.student_id) ?? 0) + 1);
   const byId = new Map(students.map((s) => [s.id, s]));
 
   const reflected = students.filter((s) => lastRefl.has(s.id)).length;
@@ -373,14 +390,14 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
         {tab === 'jadwal' && (
           <>
             <p className="lead">Jadwal ini yang dilihat siswa saat mengajukan konsultasi.</p>
-            {(slotRes.data ?? []).length === 0 ? (
+            {slotsData.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '32px', color: 'var(--muted)' }}>
                 <div style={{ fontSize: 36, marginBottom: 10 }}>🕐</div>
                 <p>Belum ada jadwal. Tambahkan jadwal pertama di bawah.</p>
               </div>
             ) : (
               <div style={{ display: 'grid', gap: 10 }}>
-                {(slotRes.data ?? []).map((sl) => (
+                {slotsData.map((sl) => (
                   <div key={sl.id} style={{
                     display: 'flex', alignItems: 'center', gap: 14,
                     padding: '16px 20px', background: '#fff',

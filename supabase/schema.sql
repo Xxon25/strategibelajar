@@ -73,7 +73,7 @@ create table if not exists students (
   token_hash text not null unique,
   nickname text not null check (char_length(nickname) between 1 and 20),
   class text not null check (class in ('X','XI','XII')),
-  school_code text not null references school_codes(code),
+  school_code text not null references school_codes(code) on delete cascade,
   consent_at timestamptz,
   share_summary boolean not null default false,
   include_reflection boolean not null default false,

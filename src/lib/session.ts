@@ -19,14 +19,23 @@ export type Student = {
 };
 
 export async function getStudent(): Promise<Student | null> {
-  const token = (await cookies()).get(STUDENT_COOKIE)?.value;
-  if (!token) return null;
-  const { data } = await admin()
-    .from('students')
-    .select('id,nickname,class,school_code,consent_at,share_summary,include_reflection')
-    .eq('token_hash', hash(token))
-    .maybeSingle();
-  return (data as Student | null) ?? null;
+  try {
+    const token = (await cookies()).get(STUDENT_COOKIE)?.value;
+    if (!token) return null;
+    const { data, error } = await admin()
+      .from('students')
+      .select('id,nickname,class,school_code,consent_at,share_summary,include_reflection')
+      .eq('token_hash', hash(token))
+      .maybeSingle();
+    if (error) {
+      console.error('[getStudent] Supabase error:', error.message);
+      return null;
+    }
+    return (data as Student | null) ?? null;
+  } catch (err) {
+    console.error('[getStudent] Unexpected error:', err);
+    return null;
+  }
 }
 
 export async function requireStudent(opts?: { consent?: boolean }): Promise<Student> {
@@ -39,13 +48,23 @@ export async function requireStudent(opts?: { consent?: boolean }): Promise<Stud
 export type Guru = { user_id: string; name: string; school_name: string };
 
 export async function getGuru(): Promise<Guru | null> {
-  const sb = await supabaseAuth();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
-  if (!user) return null;
-  const { data } = await admin().from('counselors').select('user_id,name,school_name').eq('user_id', user.id).maybeSingle();
-  return (data as Guru | null) ?? null;
+  try {
+    const sb = await supabaseAuth();
+    const {
+      data: { user },
+      error: authErr,
+    } = await sb.auth.getUser();
+    if (authErr || !user) return null;
+    const { data, error } = await admin().from('counselors').select('user_id,name,school_name').eq('user_id', user.id).maybeSingle();
+    if (error) {
+      console.error('[getGuru] Supabase error:', error.message);
+      return null;
+    }
+    return (data as Guru | null) ?? null;
+  } catch (err) {
+    console.error('[getGuru] Unexpected error:', err);
+    return null;
+  }
 }
 
 export async function requireGuru(): Promise<Guru> {

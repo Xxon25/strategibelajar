@@ -1,16 +1,30 @@
 export const dynamic = 'force-dynamic'
 import { requireStudent } from '@/lib/session';
 import { studentData } from '@/lib/data';
+import { admin } from '@/lib/supabase-admin';
 import { saveStrategies } from '@/app/actions';
 import { STRATEGIES } from '@/lib/constants';
 import Quiz from '@/components/Quiz';
 import Submit from '@/components/Submit';
 import Flash from '@/components/Flash';
 
+const DEFAULT_INTRO =
+  'Tutup catatan, lalu coba jawab atau jelaskan materi dengan kata-katamu sendiri. Setelah itu, periksa catatan dan perbaiki yang belum tepat.';
+
+async function getStrategiIntro(): Promise<string> {
+  try {
+    const { data } = await admin().from('site_content').select('value').eq('key', 'strategi_intro').maybeSingle();
+    return data?.value?.trim() || DEFAULT_INTRO;
+  } catch (err) {
+    console.error('[getStrategiIntro] Error:', err);
+    return DEFAULT_INTRO;
+  }
+}
+
 export default async function Strategi({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string }> }) {
   const s = await requireStudent();
   const sp = await searchParams;
-  const { plan, quiz } = await studentData(s.id);
+  const [{ plan, quiz }, intro] = await Promise.all([studentData(s.id), getStrategiIntro()]);
 
   return (
     <>
@@ -31,8 +45,7 @@ export default async function Strategi({ searchParams }: { searchParams: Promise
           <div>
             <h3 style={{ marginBottom: 6 }}>Latihan mengingat kembali</h3>
             <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6 }}>
-              Tutup catatan, lalu coba jawab atau jelaskan materi dengan kata-katamu sendiri.
-              Setelah itu, periksa catatan dan perbaiki yang belum tepat.
+              {intro}
             </p>
             <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 8, lineHeight: 1.5 }}>
               Strategi ini dan belajar terdistribusi dinilai efektif tinggi (Dunlosky et al., 2013).
