@@ -1,5 +1,20 @@
 import type { Metadata, Viewport } from 'next';
+import { Bricolage_Grotesque, Source_Sans_3 } from 'next/font/google';
 import './globals.css';
+
+const fontDisplay = Bricolage_Grotesque({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  display: 'swap',
+  variable: '--fd',
+});
+
+const fontBody = Source_Sans_3({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  display: 'swap',
+  variable: '--fb',
+});
 
 export const metadata: Metadata = {
   title: 'Ruang Strategi Belajar (RSB)',
@@ -11,15 +26,7 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1, view
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap"
-        />
-      </head>
+    <html lang="id" className={`${fontDisplay.variable} ${fontBody.variable}`}>
       <body>{children}</body>
     </html>
   );

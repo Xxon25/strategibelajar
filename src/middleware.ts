@@ -6,6 +6,12 @@ export async function middleware(req: NextRequest) {
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   let res = NextResponse.next({ request: req });
   if (!url || !anon) return res;
+
+  // Fast-path: lewati round-trip jaringan ke Supabase jika tidak ada cookie sesi Auth (sb-*)
+  const allCookies = req.cookies.getAll();
+  const hasAuthCookie = allCookies.some((c) => c.name.startsWith('sb-'));
+  if (!hasAuthCookie) return res;
+
   try {
     const sb = createServerClient(url, anon, {
       cookies: {
@@ -24,4 +30,4 @@ export async function middleware(req: NextRequest) {
   return res;
 }
 
-export const config = { matcher: ['/guru/:path*', '/admin/:path*', '/siswa/:path*'] };
+export const config = { matcher: ['/guru/:path*', '/admin/:path*'] };

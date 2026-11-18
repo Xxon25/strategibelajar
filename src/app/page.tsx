@@ -1,17 +1,8 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link';
 import { getStudent } from '@/lib/session';
-import { admin } from '@/lib/supabase-admin';
+import { getSiteContent } from '@/lib/data';
 import Flash from '@/components/Flash';
-
-async function getContent(): Promise<Record<string, string>> {
-  try {
-    const { data } = await admin().from('site_content').select('key,value');
-    return Object.fromEntries((data ?? []).map(r => [r.key, r.value]));
-  } catch {
-    return {};
-  }
-}
 
 const DEFAULT: Record<string, string> = {
   home_title:    'Ruang Strategi Belajar',
@@ -25,14 +16,14 @@ const DEFAULT: Record<string, string> = {
 
 export default async function Masuk({ searchParams }: { searchParams: Promise<{ ok?: string }> }) {
   const sp = await searchParams;
-  const [s, content] = await Promise.all([getStudent(), getContent()]);
+  const [s, content] = await Promise.all([getStudent(), getSiteContent()]);
   const c = { ...DEFAULT, ...content };
 
   const badges = [
-    ['📚', c.home_badge1],
-    ['🎯', c.home_badge2],
-    ['⏰', c.home_badge3],
-    ['🪞', c.home_badge4],
+    [c.home_badge1],
+    [c.home_badge2],
+    [c.home_badge3],
+    [c.home_badge4],
   ];
 
   return (
@@ -50,7 +41,7 @@ export default async function Masuk({ searchParams }: { searchParams: Promise<{ 
             width: '32px', height: '32px', borderRadius: '10px',
             background: 'var(--grad)', display: 'grid', placeItems: 'center',
             fontSize: '16px', flexShrink: 0,
-          }}>📗</div>
+          }} />
           <span style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: '16px', color: 'var(--ink2)' }}>
             {c.home_title}
           </span>
@@ -101,13 +92,13 @@ export default async function Masuk({ searchParams }: { searchParams: Promise<{ 
         </p>
 
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', position: 'relative' }}>
-          {badges.map(([icon, label]) => (
+          {badges.map(([label]) => (
             <span key={label} style={{
               padding: '7px 16px', borderRadius: '99px',
               border: '1px solid rgba(255,255,255,.2)',
               background: 'rgba(255,255,255,.1)',
               color: 'rgba(255,255,255,.9)', fontSize: '13px', fontWeight: 600,
-            }}>{icon} {label}</span>
+            }}>{label}</span>
           ))}
         </div>
       </div>
@@ -173,7 +164,6 @@ export default async function Masuk({ searchParams }: { searchParams: Promise<{ 
             padding: '14px 18px', borderRadius: 'var(--r)',
             background: 'var(--surface2)', border: '1px solid var(--line)',
           }}>
-            <span style={{ fontSize: '18px', flexShrink: 0 }}>🔒</span>
             <p style={{ fontSize: '12px', color: 'var(--muted)', margin: 0, lineHeight: 1.6 }}>
               Ruang guru dilindungi login. Siswa tidak bisa membuka halaman guru maupun melihat data siswa lain.
             </p>

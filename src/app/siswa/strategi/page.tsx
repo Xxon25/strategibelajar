@@ -1,8 +1,7 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link';
 import { requireStudent } from '@/lib/session';
-import { studentData } from '@/lib/data';
-import { admin } from '@/lib/supabase-admin';
+import { studentStrategiData, getSiteContent } from '@/lib/data';
 import { saveStrategies } from '@/app/actions';
 import { STRATEGIES } from '@/lib/constants';
 import Quiz from '@/components/Quiz';
@@ -12,20 +11,14 @@ import Flash from '@/components/Flash';
 const DEFAULT_INTRO =
   'Tutup catatan, lalu coba jawab atau jelaskan materi dengan kata-katamu sendiri. Setelah itu, periksa catatan dan perbaiki yang belum tepat.';
 
-async function getStrategiIntro(): Promise<string> {
-  try {
-    const { data } = await admin().from('site_content').select('value').eq('key', 'strategi_intro').maybeSingle();
-    return data?.value?.trim() || DEFAULT_INTRO;
-  } catch (err) {
-    console.error('[getStrategiIntro] Error:', err);
-    return DEFAULT_INTRO;
-  }
-}
-
 export default async function Strategi({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string }> }) {
   const s = await requireStudent();
-  const sp = await searchParams;
-  const [{ plan, quiz }, intro] = await Promise.all([studentData(s.id), getStrategiIntro()]);
+  const [sp, { strategies, quiz }, content] = await Promise.all([
+    searchParams,
+    studentStrategiData(s.id),
+    getSiteContent(),
+  ]);
+  const intro = content.strategi_intro?.trim() || DEFAULT_INTRO;
 
   return (
     <>
@@ -67,7 +60,7 @@ export default async function Strategi({ searchParams }: { searchParams: Promise
         <fieldset>
           {STRATEGIES.map((st) => (
             <label key={st.id} className="choice">
-              <input type="checkbox" name="s" value={st.id} defaultChecked={plan.strategies.includes(st.id)} />
+              <input type="checkbox" name="s" value={st.id} defaultChecked={strategies.includes(st.id)} />
               <span>
                 <span style={{ fontWeight: 700, display: 'block', marginBottom: 2 }}>{st.label}</span>
                 <span style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400 }}>{st.desc}</span>

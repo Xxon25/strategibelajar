@@ -2,11 +2,11 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { randomBytes } from 'crypto';
 import { admin } from '@/lib/supabase-admin';
 import { supabaseAuth } from '@/lib/supabase-server';
-import { requireAdmin, PREVIEW_GURU_COOKIE, PREVIEW_STUDENT_COOKIE, hash } from '@/lib/session';
+import { requireAdmin, PREVIEW_GURU_COOKIE, PREVIEW_STUDENT_COOKIE, signPreviewId, hash } from '@/lib/session';
 import { STATUSES } from '@/lib/constants';
 import type { FormState } from './actions';
 
@@ -56,7 +56,7 @@ export async function previewGuru(f: FormData) {
   const userId = txt(f, 'user_id', 60);
   if (!userId) redirect('/admin?tab=view');
   const store = await cookies();
-  store.set(PREVIEW_GURU_COOKIE, userId, {
+  store.set(PREVIEW_GURU_COOKIE, signPreviewId(userId), {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
@@ -71,7 +71,7 @@ export async function previewStudent(f: FormData) {
   const studentId = txt(f, 'student_id', 60);
   if (!studentId) redirect('/admin?tab=view');
   const store = await cookies();
-  store.set(PREVIEW_STUDENT_COOKIE, studentId, {
+  store.set(PREVIEW_STUDENT_COOKIE, signPreviewId(studentId), {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
@@ -139,7 +139,7 @@ export async function createDemoStudent() {
   }
   if (!demoId) redirect('/admin?tab=view');
   const store = await cookies();
-  store.set(PREVIEW_STUDENT_COOKIE, demoId, {
+  store.set(PREVIEW_STUDENT_COOKIE, signPreviewId(demoId), {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
@@ -171,6 +171,7 @@ export async function saveContent(f: FormData) {
       const key = k.replace('content_', '');
       await sb.from('site_content').upsert({ key, value: String(v).trim(), updated_at: new Date().toISOString() });
     }
+    revalidateTag('site-content');
     revalidatePath('/');
     revalidatePath('/siswa/strategi');
     revalidatePath('/admin');
@@ -284,6 +285,7 @@ export async function adminAddSlot(f: FormData) {
   if (!ownerId || !label) return;
   try {
     await admin().from('consult_slots').insert({ owner_id: ownerId, label });
+    revalidateTag('consult-slots');
     revalidatePath('/admin');
     revalidatePath('/guru');
     revalidatePath('/siswa/bantuan');
@@ -301,6 +303,7 @@ export async function adminToggleSlot(f: FormData) {
     const { data: s } = await sb.from('consult_slots').select('active').eq('id', id).maybeSingle();
     if (!s) return;
     await sb.from('consult_slots').update({ active: !s.active }).eq('id', id);
+    revalidateTag('consult-slots');
     revalidatePath('/admin');
     revalidatePath('/guru');
     revalidatePath('/siswa/bantuan');

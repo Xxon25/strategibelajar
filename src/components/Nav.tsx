@@ -61,13 +61,13 @@ export function BottomNav() {
 }
 
 const TABS_PLAN = [
-  { href: '/siswa/kebiasaan', label: '1. Kenali Kebiasaan', icon: '🔍' },
-  { href: '/siswa/tujuan', label: '2. Tetapkan Tujuan', icon: '🎯' },
-  { href: '/siswa/waktu', label: '3. Atur Waktu', icon: '⏰' },
+  { href: '/siswa/kebiasaan', label: '1. Kenali Kebiasaan' },
+  { href: '/siswa/tujuan', label: '2. Tetapkan Tujuan' },
+  { href: '/siswa/waktu', label: '3. Atur Waktu' },
 ];
 const TABS_DO = [
-  { href: '/siswa/strategi', label: '1. Strategi & Kuis', icon: '📚' },
-  { href: '/siswa/fokus', label: '2. Fokus Belajar', icon: '🎧' },
+  { href: '/siswa/strategi', label: '1. Strategi & Kuis' },
+  { href: '/siswa/fokus', label: '2. Fokus Belajar' },
 ];
 
 export function SubTabs() {
@@ -78,7 +78,6 @@ export function SubTabs() {
     <div className="subtabs" role="navigation" aria-label="Submenu">
       {tabs.map((t) => (
         <Link key={t.href} href={t.href} className="subtab" aria-current={p === t.href ? 'page' : undefined}>
-          <span style={{ marginRight: 6 }}>{t.icon}</span>
           {t.label}
         </Link>
       ))}

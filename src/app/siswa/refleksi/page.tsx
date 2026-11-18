@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link';
 import { requireStudent } from '@/lib/session';
-import { studentData } from '@/lib/data';
+import { studentRefleksiData } from '@/lib/data';
 import { saveReflection } from '@/app/actions';
 import { BARRIER } from '@/lib/constants';
 import DraftTextarea from '@/components/DraftTextarea';
@@ -11,8 +11,7 @@ import Flash from '@/components/Flash';
 
 export default async function Refleksi({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string }> }) {
   const s = await requireStudent();
-  const sp = await searchParams;
-  const d = await studentData(s.id);
+  const [sp, d] = await Promise.all([searchParams, studentRefleksiData(s.id)]);
   const last = d.reflections[0];
   const support = last?.support_flag && sp.ok === 'support';
   const talk = last && !last.support_flag && last.barrier === 'ya' && sp.ok === 'refleksi';
@@ -20,7 +19,7 @@ export default async function Refleksi({ searchParams }: { searchParams: Promise
   return (
     <>
       <div style={{ background: 'var(--grad)', borderRadius: 'var(--r-lg)', padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.6)' }}>🪞 Refleksi diri</span>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.6)' }}>Refleksi diri</span>
         <h2 style={{ color: '#fff', margin: 0, fontSize: 24 }}>Tinjau setelah seminggu.</h2>
         <p style={{ color: 'rgba(255,255,255,.75)', margin: 0, fontSize: 15, lineHeight: 1.6, maxWidth: 500 }}>
           Isi setelah mempraktikkan strategi. Hanya kamu yang bisa membaca refleksi ini.
@@ -50,9 +49,9 @@ export default async function Refleksi({ searchParams }: { searchParams: Promise
 
         <form action={saveReflection} style={{ display: 'grid', gap: 16 }}>
           <div className="card">
-            <h3>✍️ Refleksiku minggu ini</h3>
+            <h3>Refleksiku minggu ini</h3>
             <div>
-              <label className="q" htmlFor="r1">🌟 Apa yang berhasil?</label>
+              <label className="q" htmlFor="r1">Apa yang berhasil?</label>
               <DraftTextarea id="r1" name="r1" storageKey="rsb-draft-r1" placeholder="Strategi atau kebiasaan yang berhasil kamu lakukan..." />
             </div>
             <div>

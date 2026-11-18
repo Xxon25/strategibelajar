@@ -75,17 +75,17 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
   });
 
   const statCards = [
-    { icon: '👨‍🎓', val: students.length, label: 'Siswa terdaftar', color: '#e8524a', bg: '#fff0ef' },
-    { icon: '🪞', val: reflected, label: 'Sudah refleksi', color: '#2a9d8f', bg: '#e8f7f5' },
-    { icon: '📅', val: baru, label: 'Konsultasi baru', color: '#7c5cbf', bg: '#f3eeff' },
-    { icon: '📋', val: (codes ?? []).filter((c) => c.active).length, label: 'Kode aktif', color: '#d4820a', bg: '#fff8ed' },
+    { val: students.length, label: 'Siswa terdaftar', color: '#e8524a', bg: '#fff0ef' },
+    { val: reflected, label: 'Sudah refleksi', color: '#2a9d8f', bg: '#e8f7f5' },
+    { val: baru, label: 'Konsultasi baru', color: '#7c5cbf', bg: '#f3eeff' },
+    { val: (codes ?? []).filter((c) => c.active).length, label: 'Kode aktif', color: '#d4820a', bg: '#fff8ed' },
   ];
 
-  const tabItems: Array<[string, string, string]> = [
-    ['siswa', '👨‍🎓', 'Siswa'],
-    ['konsul', '📅', baru > 0 ? `Konsultasi (${baru})` : 'Konsultasi'],
-    ['kode', '🔑', 'Kode Sekolah'],
-    ['jadwal', '🕐', 'Jadwal'],
+  const tabItems: Array<[string, string]> = [
+    ['siswa', 'Siswa'],
+    ['konsul', baru > 0 ? `Konsultasi (${baru})` : 'Konsultasi'],
+    ['kode', 'Kode Sekolah'],
+    ['jadwal', 'Jadwal'],
   ];
 
   return (
@@ -100,12 +100,11 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
           fontSize: 13, fontWeight: 600,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>👁️</span>
             <span><b>Mode Preview Admin</b> — Sedang melihat View Guru BK: <b>{g.name}</b> ({g.school_name})</span>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <Link href="/admin?tab=view" style={{ padding: '5px 12px', borderRadius: 8, background: 'rgba(255,255,255,.18)', color: '#fff', fontWeight: 700, fontSize: 12, textDecoration: 'none' }}>
-              🔄 Ganti View
+              Ganti View
             </Link>
             <form action={exitPreview}>
               <input type="hidden" name="to" value="/admin" />
@@ -126,7 +125,7 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
         boxShadow: 'var(--shadow-sm)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--grad)', display: 'grid', placeItems: 'center', fontSize: 16, boxShadow: '0 2px 8px rgba(232,82,74,.3)' }}>📗</div>
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--grad)', display: 'grid', placeItems: 'center', fontSize: 16, boxShadow: '0 2px 8px rgba(232,82,74,.3)' }} />
           <span style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 15, color: 'var(--accent)' }}>Ruang Strategi Belajar</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -142,20 +141,19 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 12 }}>
           <div>
             <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'var(--accent)', opacity: .8 }}>Ruang Guru BK · {g.school_name}</span>
-            <h2 style={{ marginTop: 4 }}>Halo, {g.name} 👋</h2>
+            <h2 style={{ marginTop: 4 }}>Halo, {g.name}</h2>
           </div>
           {baru > 0 && (
             <div style={{ background: 'var(--accent)', color: '#fff', padding: '8px 18px', borderRadius: 'var(--r)', fontWeight: 700, fontSize: 14, boxShadow: '0 2px 8px rgba(232,82,74,.3)' }}>
-              🔔 {baru} konsultasi baru
+              {baru} konsultasi baru
             </div>
           )}
         </div>
 
         {/* ── Stat cards ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-          {statCards.map(({ icon, val, label, color, bg }) => (
+          {statCards.map(({ val, label, color, bg }) => (
             <div key={label} style={{ background: '#fff', border: '1.5px solid var(--line)', borderRadius: 'var(--r-lg)', padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'center', boxShadow: 'var(--shadow-sm)', borderTop: `3px solid ${color}` }}>
-              <span style={{ width: 44, height: 44, borderRadius: 12, background: bg, display: 'grid', placeItems: 'center', fontSize: 22, flexShrink: 0 }}>{icon}</span>
               <div>
                 <div style={{ fontFamily: 'var(--fd)', fontSize: 28, fontWeight: 800, color, lineHeight: 1 }}>{val}</div>
                 <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 3 }}>{label}</div>
@@ -167,7 +165,6 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
         {/* ── Alerts ── */}
         {alerts.map((s) => (
           <div key={s.id} className="note" style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-            <span style={{ fontSize: 24, flexShrink: 0 }}>🚨</span>
             <div>
               <span className="big">Perlu perhatian: {s.nickname} ({s.class})</span>
               <small>Refleksinya memuat kata bernada putus asa. Sebaiknya hubungi siswa secara pribadi hari ini.</small>
@@ -177,7 +174,7 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
 
         {/* ── Tab navigation ── */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', borderBottom: '2px solid var(--line)', paddingBottom: 0 }}>
-          {tabItems.map(([k, icon, l]) => (
+          {tabItems.map(([k, l]) => (
             <Link key={k} href={`/guru?tab=${k}`} style={{
               display: 'flex', alignItems: 'center', gap: 6,
               padding: '10px 20px',
@@ -190,7 +187,7 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
               marginBottom: tab === k ? '-2px' : 0,
               transition: 'color .15s, background .15s',
             }}>
-              <span>{icon}</span> {l}
+              {l}
               {k === 'konsul' && baru > 0 && (
                 <span style={{ background: 'var(--accent)', color: '#fff', fontSize: 10, fontWeight: 800, padding: '1px 6px', borderRadius: 99, marginLeft: 2 }}>{baru}</span>
               )}
@@ -223,7 +220,6 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
 
             {rows.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--muted)' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
                 <p style={{ fontSize: 15, fontWeight: 600 }}>Tidak ada siswa yang cocok dengan filter ini.</p>
               </div>
             ) : (
@@ -276,7 +272,7 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
                               <td>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                   <span style={{ fontSize: 13, fontWeight: 600 }}>{BARRIER[r.barrier].short}</span>
-                                  {r.support_flag && <span className="chip warn" style={{ alignSelf: 'flex-start', fontSize: 10 }}>⚠️ Perlu perhatian</span>}
+                                  {r.support_flag && <span className="chip warn" style={{ alignSelf: 'flex-start', fontSize: 10 }}>Perlu perhatian</span>}
                                   {s.include_reflection && (
                                     <details style={{ marginTop: 4 }}>
                                       <summary style={{ fontSize: 12, cursor: 'pointer', color: 'var(--accent)' }}>Lihat refleksi</summary>
@@ -320,7 +316,6 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
           <>
             {requests.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--muted)' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
                 <p style={{ fontSize: 15, fontWeight: 600 }}>Belum ada permintaan konsultasi.</p>
               </div>
             ) : (
@@ -369,7 +364,6 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
             <p className="lead">Berikan kode ini kepada siswa untuk mendaftar. Nonaktifkan kode yang sudah tidak dipakai.</p>
             {(codes ?? []).length === 0 ? (
               <div style={{ textAlign: 'center', padding: '32px', color: 'var(--muted)' }}>
-                <div style={{ fontSize: 36, marginBottom: 10 }}>🔑</div>
                 <p>Belum ada kode. Buat kode pertamamu di bawah.</p>
               </div>
             ) : (
@@ -404,7 +398,7 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
               </div>
             )}
             <form action={newCode} className="card" style={{ borderTop: '3px solid var(--accent)' }}>
-              <h3>➕ Buat kode baru</h3>
+              <h3>Buat kode baru</h3>
               <div>
                 <label className="q" htmlFor="note">Catatan (opsional)</label>
                 <input type="text" id="note" name="note" maxLength={80} placeholder="Contoh: Kelas XI IPA 2 — Semester Ganjil 2025" />
@@ -420,7 +414,6 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
             <p className="lead">Jadwal ini yang dilihat siswa saat mengajukan konsultasi.</p>
             {slotsData.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '32px', color: 'var(--muted)' }}>
-                <div style={{ fontSize: 36, marginBottom: 10 }}>🕐</div>
                 <p>Belum ada jadwal. Tambahkan jadwal pertama di bawah.</p>
               </div>
             ) : (
@@ -432,7 +425,6 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
                     border: `1.5px solid ${sl.active ? 'var(--line)' : 'var(--warn-line)'}`,
                     borderRadius: 'var(--r-lg)', boxShadow: 'var(--shadow-sm)',
                   }}>
-                    <span style={{ fontSize: 20, flexShrink: 0 }}>🕐</span>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--ink2)' }}>{sl.label}</div>
                     </div>
@@ -450,7 +442,7 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
               </div>
             )}
             <form action={addSlot} className="card" style={{ borderTop: '3px solid var(--sec)' }}>
-              <h3>➕ Tambah jadwal</h3>
+              <h3>Tambah jadwal</h3>
               <div>
                 <label className="q" htmlFor="label">Jadwal konsultasi</label>
                 <input type="text" id="label" name="label" maxLength={80} placeholder="Contoh: Jumat, 10.00 – 11.00" required />

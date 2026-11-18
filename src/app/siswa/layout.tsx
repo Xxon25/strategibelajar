@@ -21,12 +21,11 @@ export default async function SiswaLayout({ children }: { children: React.ReactN
           fontSize: 13, fontWeight: 600,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>👁️</span>
             <span><b>Mode Preview Admin</b> — Sedang melihat View Siswa: <b>{s.nickname}</b> (Kelas {s.class} · {s.school_code})</span>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <Link href="/admin?tab=view" style={{ padding: '5px 12px', borderRadius: 8, background: 'rgba(255,255,255,.18)', color: '#fff', fontWeight: 700, fontSize: 12, textDecoration: 'none' }}>
-              🔄 Ganti View
+              Ganti View
             </Link>
             <form action={exitPreview}>
               <input type="hidden" name="to" value="/admin" />
@@ -54,7 +53,7 @@ export default async function SiswaLayout({ children }: { children: React.ReactN
             width: 36, height: 36, borderRadius: 11, flexShrink: 0,
             background: 'var(--grad)', display: 'grid', placeItems: 'center',
             fontSize: 18, boxShadow: '0 4px 10px rgba(232,82,74,.28)',
-          }}>📗</div>
+          }} />
           <div>
             <div style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 15, color: 'var(--ink2)', lineHeight: 1.1 }}>
               Ruang Strategi Belajar

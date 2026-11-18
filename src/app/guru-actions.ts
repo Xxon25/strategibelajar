@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { randomBytes } from 'crypto';
 import { admin } from '@/lib/supabase-admin';
 import { supabaseAuth } from '@/lib/supabase-server';
@@ -113,6 +113,7 @@ export async function addSlot(f: FormData) {
   if (!label) return;
   try {
     await admin().from('consult_slots').insert({ owner_id: g.user_id, label });
+    revalidateTag('consult-slots');
     revalidatePath('/guru');
     revalidatePath('/siswa/bantuan');
   } catch (err) {
@@ -128,6 +129,7 @@ export async function toggleSlot(f: FormData) {
     const { data: s } = await sb.from('consult_slots').select('active').eq('id', id).eq('owner_id', g.user_id).maybeSingle();
     if (!s) return;
     await sb.from('consult_slots').update({ active: !s.active }).eq('id', id).eq('owner_id', g.user_id);
+    revalidateTag('consult-slots');
     revalidatePath('/guru');
     revalidatePath('/siswa/bantuan');
   } catch (err) {

@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link';
 import { requireStudent } from '@/lib/session';
-import { studentData } from '@/lib/data';
+import { studentPlan } from '@/lib/data';
 import { saveHabits } from '@/app/actions';
 import { HABITS_HELP, HABITS_HINDER } from '@/lib/constants';
 import Submit from '@/components/Submit';
@@ -9,8 +9,7 @@ import Flash from '@/components/Flash';
 
 export default async function Kebiasaan({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string }> }) {
   const s = await requireStudent();
-  const sp = await searchParams;
-  const { plan } = await studentData(s.id);
+  const [sp, plan] = await Promise.all([searchParams, studentPlan(s.id)]);
   const all = [
     ...HABITS_HINDER.map((h) => ({ ...h, pre: 'Kurangi', color: '#f59e0b' })),
     ...HABITS_HELP.map((h) => ({ ...h, pre: 'Mulai/pertahankan', color: 'var(--sec)' })),
@@ -23,9 +22,7 @@ export default async function Kebiasaan({ searchParams }: { searchParams: Promis
         background: 'var(--grad)', borderRadius: 'var(--r-lg)',
         padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 8,
       }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.6)' }}>
-          🗺️ Perencanaan · Langkah 1 dari 3
-        </span>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.6)' }}>Perencanaan · Langkah 1 dari 3</span>
         <h2 style={{ color: '#fff', margin: 0, fontSize: 24 }}>Satu kebiasaan dulu.</h2>
         <p style={{ color: 'rgba(255,255,255,.75)', margin: 0, fontSize: 15, lineHeight: 1.6, maxWidth: 540 }}>
           Tandai kebiasaan yang sudah kamu lakukan, lalu pilih satu yang ingin dicoba minggu ini.
@@ -50,8 +47,8 @@ export default async function Kebiasaan({ searchParams }: { searchParams: Promis
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 10,
-                background: 'var(--sec-tint)', display: 'grid', placeItems: 'center', fontSize: 18,
-              }}>✅</div>
+                background: 'var(--sec-tint)', display: 'grid', placeItems: 'center',
+              }} />
               <div>
                 <h3 style={{ margin: 0 }}>Kebiasaan yang membantu</h3>
                 <p className="small" style={{ margin: 0 }}>Centang yang sudah kamu lakukan</p>
@@ -72,8 +69,8 @@ export default async function Kebiasaan({ searchParams }: { searchParams: Promis
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 10,
-                background: '#fff7ed', display: 'grid', placeItems: 'center', fontSize: 18,
-              }}>⚠️</div>
+                background: '#fff7ed', display: 'grid', placeItems: 'center',
+              }} />
               <div>
                 <h3 style={{ margin: 0 }}>Kebiasaan yang bisa menghambat</h3>
                 <p className="small" style={{ margin: 0 }}>Centang yang kadang kamu lakukan</p>
@@ -95,8 +92,8 @@ export default async function Kebiasaan({ searchParams }: { searchParams: Promis
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
               width: 36, height: 36, borderRadius: 10,
-              background: 'var(--tint2)', display: 'grid', placeItems: 'center', fontSize: 18,
-            }}>🎯</div>
+              background: 'var(--tint2)', display: 'grid', placeItems: 'center',
+            }} />
             <div>
               <h3 style={{ margin: 0 }}>Pilih satu kebiasaan untuk dicoba minggu ini</h3>
               <p className="small" style={{ margin: 0 }}>Fokus pada satu hal, bukan semuanya</p>
@@ -125,7 +122,7 @@ export default async function Kebiasaan({ searchParams }: { searchParams: Promis
           </div>
         </div>
 
-        <Submit>💾 Simpan Pilihan Kebiasaan</Submit>
+        <Submit>Simpan Pilihan Kebiasaan</Submit>
       </form>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>

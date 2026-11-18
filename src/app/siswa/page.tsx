@@ -32,7 +32,7 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
             background: 'rgba(255,255,255,.16)', fontSize: 12, fontWeight: 700,
             letterSpacing: '.06em', textTransform: 'uppercase',
           }}>
-            👋 Selamat datang, {s.nickname} · Kelas {s.class}
+            Selamat datang, {s.nickname} · Kelas {s.class}
           </span>
           <h2 style={{ color: '#fff', fontSize: 'clamp(24px, 4vw, 32px)', margin: 0, lineHeight: 1.2 }}>
             Satu strategi belajar, dicoba satu minggu.
@@ -45,26 +45,21 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
         <div className="card" style={{ padding: '24px 26px', gap: 18 }}>
           <div>
             <span className="eyebrow">Privasi &amp; Kenyamanan</span>
-            <h3 style={{ fontSize: 18 }}>📋 Sebelum mulai, pahami dulu cara kerja ruang ini</h3>
+            <h3 style={{ fontSize: 18 }}>Sebelum mulai, pahami dulu cara kerja ruang ini</h3>
           </div>
           <style>{`@media(min-width:600px){.consent-g{display:grid!important;grid-template-columns:1fr 1fr;gap:12px}}`}</style>
           <div className="consent-g" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {([
-              ['📝', 'Data yang dicatat', 'Nama panggilan, kelas, rencana belajar, latihan kuis, refleksi, dan jadwal konsultasi.'],
-              ['👁️', 'Siapa yang bisa melihat', 'Hanya kamu. Guru BK hanya melihat bagian yang kamu izinkan. Siswa lain tidak punya akses.'],
-              ['🛡️', 'Aman & Minimalis', 'Tanpa iklan, tanpa pelacak pihak ketiga, dan kamu bisa menghapus seluruh datamu kapan saja.'],
-              ['🤝', 'Pendamping Belajar', 'Aplikasi ini membantumu mengatur strategi belajar mandiri bersama Guru BK di sekolah.'],
-            ] as [string, string, string][]).map(([icon, label, desc]) => (
+              ['Data yang dicatat', 'Nama panggilan, kelas, rencana belajar, latihan kuis, refleksi, dan jadwal konsultasi.'],
+              ['Siapa yang bisa melihat', 'Hanya kamu. Guru BK hanya melihat bagian yang kamu izinkan. Siswa lain tidak punya akses.'],
+              ['Aman & Minimalis', 'Tanpa iklan, tanpa pelacak pihak ketiga, dan kamu bisa menghapus seluruh datamu kapan saja.'],
+              ['Pendamping Belajar', 'Aplikasi ini membantumu mengatur strategi belajar mandiri bersama Guru BK di sekolah.'],
+            ] as [string, string][]).map(([label, desc]) => (
               <div key={label} style={{
                 display: 'flex', gap: 14, padding: '16px',
                 background: 'var(--surface2)', borderRadius: 'var(--r)',
                 border: '1px solid var(--line)', alignItems: 'flex-start',
               }}>
-                <span style={{
-                  width: 40, height: 40, borderRadius: 12,
-                  background: '#fff', display: 'grid', placeItems: 'center',
-                  fontSize: 20, flexShrink: 0, boxShadow: 'var(--shadow-sm)',
-                }}>{icon}</span>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink2)' }}>{label}</div>
                   <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4, lineHeight: 1.5 }}>{desc}</div>
@@ -92,42 +87,39 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
   const focusHabitLabel = allHabits.find((h) => h.id === p.habit_focus)?.label ?? null;
   const strategyLabels = STRATEGIES.filter((st) => p.strategies.includes(st.id)).map((st) => st.label);
 
-  const groups: Array<{ phase: string; subtitle: string; icon: string; accent: string; bg: string; border: string; rows: Row[] }> = [
+  const groups: Array<{ phase: string; subtitle: string; accent: string; bg: string; border: string; rows: Row[] }> = [
     {
       phase: '1. Perencanaan',
       subtitle: 'Susun fondasi belajarmu minggu ini',
-      icon: '🗺️',
       accent: '#e8524a',
       bg: '#fff0ef',
       border: '#fad9d7',
       rows: [
-        ['/siswa/kebiasaan', 'Kenali Kebiasaan', focusHabitLabel ? `Fokus: ${focusHabitLabel}` : 'Tandai kebiasaanmu, pilih satu untuk dicoba', !!p.habit_focus, '🔍'],
-        ['/siswa/tujuan', 'Tetapkan Tujuan', p.goal ? `Tujuan: "${p.goal.slice(0, 55)}${p.goal.length > 55 ? '…' : ''}"` : 'Tulis satu tujuan spesifik untuk satu minggu', !!p.goal, '🎯'],
-        ['/siswa/waktu', 'Atur Waktu', p.sched_start ? `Mulai ${fmtDate(p.sched_start) ?? p.sched_start}${p.sched_topic ? ` · ${p.sched_topic}` : ''}` : 'Buat jadwal ulang bertahap (hari 1, 3, 7, 14)', !!p.sched_start, '⏰'],
+        ['/siswa/kebiasaan', 'Kenali Kebiasaan', focusHabitLabel ? `Fokus: ${focusHabitLabel}` : 'Tandai kebiasaanmu, pilih satu untuk dicoba', !!p.habit_focus, ''],
+        ['/siswa/tujuan', 'Tetapkan Tujuan', p.goal ? `Tujuan: "${p.goal.slice(0, 55)}${p.goal.length > 55 ? '…' : ''}"` : 'Tulis satu tujuan spesifik untuk satu minggu', !!p.goal, ''],
+        ['/siswa/waktu', 'Atur Waktu', p.sched_start ? `Mulai ${fmtDate(p.sched_start) ?? p.sched_start}${p.sched_topic ? ` · ${p.sched_topic}` : ''}` : 'Buat jadwal ulang bertahap (hari 1, 3, 7, 14)', !!p.sched_start, ''],
       ],
     },
     {
       phase: '2. Pelaksanaan',
       subtitle: 'Praktikkan strategi & jaga fokus',
-      icon: '⚡',
       accent: '#2a9d8f',
       bg: '#e8f7f5',
       border: '#c0eae5',
       rows: [
-        ['/siswa/strategi', 'Strategi & Kuis', d.quiz ? `Kuis selesai (${d.quiz.score}/${d.quiz.total} benar)` : 'Pelajari strategi efektif & kerjakan kuis latihan', !!d.quiz || p.strategies.length > 0, '📚'],
-        ['/siswa/fokus', 'Fokus Belajar', p.focus_notif || p.focus_place || p.focus_tools ? 'Rencana pengurang gangguan sudah tersimpan' : 'Susun rencana mengurangi gangguan saat belajar', !!(p.focus_notif || p.focus_place || p.focus_tools), '🎧'],
+        ['/siswa/strategi', 'Strategi & Kuis', d.quiz ? `Kuis selesai (${d.quiz.score}/${d.quiz.total} benar)` : 'Pelajari strategi efektif & kerjakan kuis latihan', !!d.quiz || p.strategies.length > 0, ''],
+        ['/siswa/fokus', 'Fokus Belajar', p.focus_notif || p.focus_place || p.focus_tools ? 'Rencana pengurang gangguan sudah tersimpan' : 'Susun rencana mengurangi gangguan saat belajar', !!(p.focus_notif || p.focus_place || p.focus_tools), ''],
       ],
     },
     {
       phase: '3. Evaluasi & Dukungan',
       subtitle: 'Tinjau hasil & diskusi dengan Guru BK',
-      icon: '🪞',
       accent: '#7c5cbf',
       bg: '#f3eeff',
       border: '#ddd0f7',
       rows: [
-        ['/siswa/refleksi', 'Refleksi Mingguan', d.reflections.length > 0 ? `${d.reflections.length} catatan refleksi tersimpan` : 'Catat yang berhasil dan kendala yang dihadapi', d.reflections.length > 0, '🪞'],
-        ['/siswa/bantuan', 'Bantuan Guru BK', d.requests.length > 0 ? `${d.requests.length} jadwal konsultasi diajukan` : 'Atur privasi berbagi data & jadwal konsultasi', d.requests.length > 0 || s.share_summary, '💬'],
+        ['/siswa/refleksi', 'Refleksi Mingguan', d.reflections.length > 0 ? `${d.reflections.length} catatan refleksi tersimpan` : 'Catat yang berhasil dan kendala yang dihadapi', d.reflections.length > 0, ''],
+        ['/siswa/bantuan', 'Bantuan Guru BK', d.requests.length > 0 ? `${d.requests.length} jadwal konsultasi diajukan` : 'Atur privasi berbagi data & jadwal konsultasi', d.requests.length > 0 || s.share_summary, ''],
       ],
     },
   ];
@@ -168,22 +160,22 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
                 background: 'rgba(255,255,255,.18)', borderRadius: 99,
                 padding: '4px 12px', fontSize: 12, fontWeight: 700, letterSpacing: '.04em',
               }}>
-                👋 Halo, {s.nickname} · Kelas {s.class}
+                Halo, {s.nickname} · Kelas {s.class}
               </span>
               {hariIni ? (
                 <span style={{ background: 'rgba(42,157,143,.9)', borderRadius: 99, padding: '4px 12px', fontSize: 12, fontWeight: 700 }}>
-                  🔥 Aktif berlatih hari ini
+                  Aktif berlatih hari ini
                 </span>
               ) : (
                 <span style={{ background: 'rgba(255,255,255,.14)', borderRadius: 99, padding: '4px 12px', fontSize: 12, fontWeight: 600 }}>
-                  ✨ Yuk lanjutkan langkahmu hari ini
+                  Lanjutkan langkahmu hari ini
                 </span>
               )}
             </div>
 
             <h2 style={{ color: '#fff', fontSize: 'clamp(22px, 3.5vw, 30px)', margin: '4px 0 8px', lineHeight: 1.2 }}>
               {doneN === core.length
-                ? 'Luar biasa! Semua langkah minggu ini sudah lengkap 🎉'
+                ? 'Semua langkah minggu ini sudah lengkap.'
                 : 'Mau lanjutkan langkah yang mana hari ini?'}
             </h2>
             <p style={{ color: 'rgba(255,255,255,.82)', fontSize: 14, margin: '0 0 18px', maxWidth: 520, lineHeight: 1.55 }}>
@@ -198,7 +190,6 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
                 fontWeight: 800, fontSize: 14, textDecoration: 'none',
                 boxShadow: '0 4px 14px rgba(0,0,0,.12)',
               }}>
-                <span>{nextStep[4]}</span>
                 <span>{doneN === core.length ? 'Tinjau Kembali: ' : 'Lanjut: '}{nextStep[1]} →</span>
               </Link>
               <Link href="/siswa/bantuan" style={{
@@ -208,7 +199,7 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
                 padding: '10px 16px', borderRadius: 12,
                 fontWeight: 700, fontSize: 13, textDecoration: 'none',
               }}>
-                💬 Hubungi Guru BK
+                Hubungi Guru BK
               </Link>
             </div>
           </div>
@@ -253,11 +244,11 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
       `}</style>
       <div className="stat-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {([
-          ['📅', String(totalHari), 'Hari berlatih bulan ini', '#e8524a', '#fff0ef'],
-          ['✅', `${doneN}/${core.length}`, 'Langkah selesai', '#2a9d8f', '#e8f7f5'],
-          ['🧠', d.quiz ? `${d.quiz.score}/${d.quiz.total}` : 'Belum', 'Skor kuis terakhir', '#d97706', '#fffbeb'],
-          ['🪞', String(reflCount), 'Refleksi ditulis', '#7c5cbf', '#f3eeff'],
-        ] as [string, string, string, string, string][]).map(([icon, val, label, color, bg]) => (
+          [String(totalHari), 'Hari berlatih bulan ini', '#e8524a', '#fff0ef'],
+          [`${doneN}/${core.length}`, 'Langkah selesai', '#2a9d8f', '#e8f7f5'],
+          [d.quiz ? `${d.quiz.score}/${d.quiz.total}` : 'Belum', 'Skor kuis terakhir', '#d97706', '#fffbeb'],
+          [String(reflCount), 'Refleksi ditulis', '#7c5cbf', '#f3eeff'],
+        ] as [string, string, string, string][]).map(([val, label, color, bg]) => (
           <div key={label} style={{
             background: 'var(--surface)', border: '1.5px solid var(--line)',
             borderTop: `3px solid ${color}`,
@@ -265,11 +256,6 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
             display: 'flex', alignItems: 'center', gap: 13,
             boxShadow: 'var(--shadow-sm)',
           }}>
-            <span style={{
-              width: 44, height: 44, borderRadius: 13,
-              background: bg, display: 'grid', placeItems: 'center',
-              fontSize: 20, flexShrink: 0,
-            }}>{icon}</span>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontFamily: 'var(--fd)', fontSize: 22, fontWeight: 800, color, lineHeight: 1.1 }}>{val}</div>
               <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 3, fontWeight: 600 }}>{label}</div>
@@ -288,7 +274,6 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18 }}>📌</span>
               <h3 style={{ margin: 0, fontSize: 16 }}>Ringkasan Rencana Belajarku</h3>
             </div>
             <span className="chip ok">Aktif Minggu Ini</span>
@@ -296,7 +281,7 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
           <div className="summary-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10 }}>
             <div style={{ padding: '12px 14px', borderRadius: 12, background: '#fff', border: '1px solid var(--line)' }}>
               <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--accent)', letterSpacing: '.05em' }}>
-                🔍 Kebiasaan Fokus
+                Kebiasaan Fokus
               </div>
               <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink2)', marginTop: 4 }}>
                 {focusHabitLabel ?? 'Belum dipilih'}
@@ -304,7 +289,7 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
             </div>
             <div style={{ padding: '12px 14px', borderRadius: 12, background: '#fff', border: '1px solid var(--line)' }}>
               <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--sec)', letterSpacing: '.05em' }}>
-                ⏰ Jadwal Ulang Materi
+                Jadwal Ulang Materi
               </div>
               <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink2)', marginTop: 4 }}>
                 {p.sched_start ? `${p.sched_topic || 'Materi pilihan'} · Mulai ${fmtDate(p.sched_start) ?? p.sched_start}` : 'Belum diatur'}
@@ -313,7 +298,7 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
             {p.goal && (
               <div style={{ padding: '12px 14px', borderRadius: 12, background: '#fff', border: '1px solid var(--line)', gridColumn: '1 / -1' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#7c5cbf', letterSpacing: '.05em' }}>
-                  🎯 Target Mingguan
+                  Target Mingguan
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink2)', marginTop: 4, lineHeight: 1.5 }}>
                   “{p.goal}”
@@ -343,11 +328,6 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
                 padding: '12px 14px', borderRadius: 14,
                 background: g.bg, border: `1px solid ${g.border}`,
               }}>
-                <span style={{
-                  width: 38, height: 38, borderRadius: 10,
-                  background: '#fff', display: 'grid', placeItems: 'center',
-                  fontSize: 18, flexShrink: 0, boxShadow: '0 2px 6px rgba(0,0,0,.05)',
-                }}>{g.icon}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 15, color: g.accent }}>{g.phase}</div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 600 }}>{g.subtitle}</div>
@@ -363,7 +343,7 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
 
               {/* Items */}
               <div style={{ display: 'grid', gap: 10 }}>
-                {g.rows.map(([href, title, desc, done, icon]) => (
+                {g.rows.map(([href, title, desc, done]) => (
                   <Link key={href} href={href} className="phase-item" style={{
                     display: 'flex', alignItems: 'center', gap: 13,
                     padding: '14px 15px',
@@ -375,13 +355,6 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
                     overflow: 'hidden',
                   }}>
                     {done && <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: g.accent }} />}
-                    <span style={{
-                      width: 42, height: 42, borderRadius: 12, flexShrink: 0,
-                      background: done ? g.accent : '#fff',
-                      color: done ? '#fff' : 'var(--ink2)',
-                      display: 'grid', placeItems: 'center', fontSize: 19,
-                      boxShadow: done ? `0 3px 10px ${g.accent}40` : 'var(--shadow-sm)',
-                    }}>{icon}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                         <span style={{ fontWeight: 800, fontSize: 14, color: 'var(--ink2)' }}>{title}</span>
@@ -411,8 +384,7 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
                       color: done ? '#fff' : 'var(--muted)',
                       border: `1.5px solid ${done ? g.accent : 'var(--line)'}`,
                     }}>
-                      {done ? '✓' : '→'}
-                    </span>
+                      {done ? '✓' : '→'}                    </span>
                   </Link>
                 ))}
               </div>
@@ -431,7 +403,8 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
         boxShadow: 'var(--shadow-sm)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--tint)', display: 'grid', placeItems: 'center', fontSize: 20 }}>💬</span>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--tint)', display: 'grid', placeItems: 'center' }}>
+          </div>
           <div>
             <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--ink2)' }}>Ingin berdiskusi langsung dengan Guru BK?</div>
             <div style={{ fontSize: 12, color: 'var(--muted)' }}>Kamu memegang kendali penuh atas data apa saja yang ingin dibagikan.</div>

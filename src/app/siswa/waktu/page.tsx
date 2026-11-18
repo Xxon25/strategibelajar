@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link';
 import { requireStudent } from '@/lib/session';
-import { studentData } from '@/lib/data';
+import { studentPlan } from '@/lib/data';
 import { saveSchedule } from '@/app/actions';
 import { SCHED } from '@/lib/constants';
 import { fmtDate, todayJakarta } from '@/lib/util';
@@ -11,18 +11,17 @@ import Flash from '@/components/Flash';
 
 export default async function Waktu({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string }> }) {
   const s = await requireStudent();
-  const sp = await searchParams;
-  const { plan } = await studentData(s.id);
+  const [sp, plan] = await Promise.all([searchParams, studentPlan(s.id)]);
   const start = plan.sched_start;
   const topic = plan.sched_topic || 'Materi pilihanmu';
 
-  const schedIcons = ['📖', '🔁', '🔁', '🔁', '🔁'];
+  const schedIcons = ['', '', '', '', ''];
 
   return (
     <>
       <div style={{ background: 'var(--grad)', borderRadius: 'var(--r-lg)', padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
         <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.65)' }}>
-          🗺️ Perencanaan · Langkah 3 dari 3
+          Perencanaan · Langkah 3 dari 3
         </span>
         <h2 style={{ color: '#fff', margin: 0, fontSize: 24 }}>Jadwal ulang bertahap.</h2>
         <p style={{ color: 'rgba(255,255,255,.78)', margin: 0, fontSize: 15, lineHeight: 1.6, maxWidth: 540 }}>
@@ -33,7 +32,7 @@ export default async function Waktu({ searchParams }: { searchParams: Promise<{ 
       <Flash ok={sp.ok} err={sp.err} />
 
       <form action={saveSchedule} className="card no-print">
-        <h3>⏰ Buat jadwal ulang</h3>
+        <h3>Buat jadwal ulang</h3>
         <div>
           <label className="q" htmlFor="start">Tanggal belajar pertama</label>
           <input type="date" id="start" name="start" defaultValue={start ?? todayJakarta()} required />
@@ -48,7 +47,7 @@ export default async function Waktu({ searchParams }: { searchParams: Promise<{ 
 
       {start && (
         <div className="card">
-          <h3>📅 Jadwal belajarku: {topic}</h3>
+          <h3>Jadwal belajarku: {topic}</h3>
           <div style={{ display: 'grid', gap: 8 }}>
             {SCHED.map(([label, add], i) => (
               <div key={label} style={{

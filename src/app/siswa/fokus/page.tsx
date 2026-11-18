@@ -1,21 +1,20 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link';
 import { requireStudent } from '@/lib/session';
-import { studentData } from '@/lib/data';
+import { studentPlan } from '@/lib/data';
 import { saveFocus } from '@/app/actions';
 import Submit from '@/components/Submit';
 import Flash from '@/components/Flash';
 
 export default async function Fokus({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string }> }) {
   const s = await requireStudent();
-  const sp = await searchParams;
-  const { plan } = await studentData(s.id);
+  const [sp, plan] = await Promise.all([searchParams, studentPlan(s.id)]);
 
   const tips = [
-    ['🔕', 'Notifikasi', 'Matikan atau taruh ponsel di luar jangkauan selama sesi belajar.'],
-    ['📍', 'Tempat belajar', 'Pilih satu tempat yang tenang dan rapi.'],
-    ['🎒', 'Siapkan alat', 'Alat tulis, catatan, dan air minum sebelum mulai.'],
-    ['⏱️', 'Bagi waktu', 'Belajar singkat, lalu istirahat sebentar (misal 25 menit belajar, 5 menit istirahat).'],
+    ['Notifikasi', 'Matikan atau taruh ponsel di luar jangkauan selama sesi belajar.'],
+    ['Tempat belajar', 'Pilih satu tempat yang tenang dan rapi.'],
+    ['Siapkan alat', 'Alat tulis, catatan, dan air minum sebelum mulai.'],
+    ['Bagi waktu', 'Belajar singkat, lalu istirahat sebentar (misal 25 menit belajar, 5 menit istirahat).'],
   ];
 
   return (
@@ -33,14 +32,13 @@ export default async function Fokus({ searchParams }: { searchParams: Promise<{ 
       {/* Tips grid */}
       <style>{`@media(min-width:700px){.tips-grid{display:grid!important;grid-template-columns:1fr 1fr;gap:12px}}`}</style>
       <div className="tips-grid" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {tips.map(([icon, label, desc]) => (
+        {tips.map(([label, desc]) => (
           <div key={String(label)} style={{
             display: 'flex', gap: 12, padding: '14px 16px',
             background: 'var(--surface)', border: '1px solid var(--line)',
             borderRadius: 'var(--r)', alignItems: 'flex-start',
             boxShadow: 'var(--shadow-sm)',
           }}>
-            <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{icon}</span>
             <div>
               <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink2)' }}>{label}</div>
               <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 3, lineHeight: 1.5 }}>{desc}</div>
@@ -50,26 +48,26 @@ export default async function Fokus({ searchParams }: { searchParams: Promise<{ 
       </div>
 
       <form action={saveFocus} className="card">
-        <h3>✏️ Rencanaku</h3>
+        <h3>Rencanaku</h3>
         <style>{`@media(min-width:700px){.focus-form{display:grid!important;grid-template-columns:1fr 1fr;gap:16px}}.focus-form-full{grid-column:1/-1}`}</style>
         <div className="focus-form" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
-            <label className="q" htmlFor="notif">🔕 Apa yang kamu lakukan dengan notifikasi?</label>
+            <label className="q" htmlFor="notif">Apa yang kamu lakukan dengan notifikasi?</label>
             <input type="text" id="notif" name="notif" maxLength={300} autoComplete="off"
               defaultValue={plan.focus_notif} placeholder="Contoh: Mode senyap selama 30 menit" />
           </div>
           <div>
-            <label className="q" htmlFor="place">📍 Di mana tempat belajarmu?</label>
+            <label className="q" htmlFor="place">Di mana tempat belajarmu?</label>
             <input type="text" id="place" name="place" maxLength={300} autoComplete="off"
               defaultValue={plan.focus_place} placeholder="Contoh: Meja belajar di kamar" />
           </div>
           <div className="focus-form-full">
-            <label className="q" htmlFor="tools">🎒 Alat apa yang perlu disiapkan?</label>
+            <label className="q" htmlFor="tools">Alat apa yang perlu disiapkan?</label>
             <input type="text" id="tools" name="tools" maxLength={300} autoComplete="off"
               defaultValue={plan.focus_tools} placeholder="Contoh: Buku catatan, pulpen, air minum" />
           </div>
         </div>
-        <Submit>💾 Simpan Rencana Fokus</Submit>
+        <Submit>Simpan Rencana Fokus</Submit>
         <p className="small">Gunakan contoh umum, bukan data pribadi.</p>
       </form>
 

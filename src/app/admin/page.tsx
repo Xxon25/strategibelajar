@@ -68,29 +68,73 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   let dbError: string | null = null;
 
   try {
-    const [cRes, sRes, codeRes, slotRes, planRes, quizRes, reflRes, reqRes, dayRes, contentRes] = await Promise.all([
-      sb.from('counselors').select('user_id,name,school_name,created_at').order('created_at', { ascending: false }),
-      sb.from('students').select('id,nickname,class,school_code,consent_at,share_summary,include_reflection,created_at').order('created_at', { ascending: false }),
-      sb.from('school_codes').select('code,owner_id,note,active,created_at').order('created_at', { ascending: false }),
-      sb.from('consult_slots').select('id,owner_id,label,active,created_at').order('created_at'),
-      sb.from('student_plans').select('*'),
-      sb.from('quiz_attempts').select('id,student_id,score,total,created_at').order('created_at', { ascending: false }),
-      sb.from('reflections').select('id,student_id,r1,r2,r3,barrier,support_flag,created_at').order('created_at', { ascending: false }),
-      sb.from('consult_requests').select('id,student_id,slot_label,status,created_at').order('created_at', { ascending: false }),
-      sb.from('practice_days').select('student_id,day'),
-      sb.from('site_content').select('key,value').order('key'),
-    ]);
-    counselors = (cRes.data ?? []) as Counselor[];
-    students = (sRes.data ?? []) as StudentRow[];
-    codes = (codeRes.data ?? []) as Code[];
-    slots = (slotRes.data ?? []) as Slot[];
-    plans = (planRes.data ?? []) as PlanRow[];
-    quizzes = (quizRes.data ?? []) as QuizRow[];
-    reflections = (reflRes.data ?? []) as ReflRow[];
-    requests = (reqRes.data ?? []) as ReqRow[];
-    practiceDays = (dayRes.data ?? []) as Array<{ student_id: string; day: string }>;
-    contents = Object.fromEntries((contentRes.data ?? []).map((r) => [r.key, r.value]));
-    if (cRes.error) dbError = `DB Error: ${cRes.error.message}`;
+    if (tab === 'konten') {
+      const contentRes = await sb.from('site_content').select('key,value').order('key');
+      contents = Object.fromEntries((contentRes.data ?? []).map((r) => [r.key, r.value]));
+    } else if (tab === 'view') {
+      const [cRes, sRes, codeRes] = await Promise.all([
+        sb.from('counselors').select('user_id,name,school_name,created_at').order('created_at', { ascending: false }),
+        sb.from('students').select('id,nickname,class,school_code,consent_at,share_summary,include_reflection,created_at').order('created_at', { ascending: false }),
+        sb.from('school_codes').select('code,owner_id,note,active,created_at'),
+      ]);
+      counselors = (cRes.data ?? []) as Counselor[];
+      students = (sRes.data ?? []) as StudentRow[];
+      codes = (codeRes.data ?? []) as Code[];
+    } else if (tab === 'guru') {
+      const [cRes, sRes, codeRes, slotRes] = await Promise.all([
+        sb.from('counselors').select('user_id,name,school_name,created_at').order('created_at', { ascending: false }),
+        sb.from('students').select('id,school_code'),
+        sb.from('school_codes').select('code,owner_id,note,active,created_at').order('created_at', { ascending: false }),
+        sb.from('consult_slots').select('id,owner_id,label,active,created_at').order('created_at'),
+      ]);
+      counselors = (cRes.data ?? []) as Counselor[];
+      students = (sRes.data ?? []) as StudentRow[];
+      codes = (codeRes.data ?? []) as Code[];
+      slots = (slotRes.data ?? []) as Slot[];
+    } else if (tab === 'konsul') {
+      const [sRes, reflRes, reqRes] = await Promise.all([
+        sb.from('students').select('id,nickname,class,school_code'),
+        sb.from('reflections').select('id,student_id,r1,r2,r3,barrier,support_flag,created_at').order('created_at', { ascending: false }).limit(30),
+        sb.from('consult_requests').select('id,student_id,slot_label,status,created_at').order('created_at', { ascending: false }),
+      ]);
+      students = (sRes.data ?? []) as StudentRow[];
+      reflections = (reflRes.data ?? []) as ReflRow[];
+      requests = (reqRes.data ?? []) as ReqRow[];
+    } else if (tab === 'overview') {
+      const [cRes, sRes, codeRes, slotRes, reflRes, reqRes] = await Promise.all([
+        sb.from('counselors').select('user_id,name,school_name,created_at').order('created_at', { ascending: false }),
+        sb.from('students').select('id,nickname,class,school_code,consent_at').order('created_at', { ascending: false }),
+        sb.from('school_codes').select('code,owner_id,note,active,created_at'),
+        sb.from('consult_slots').select('id,owner_id'),
+        sb.from('reflections').select('id,student_id,r1,r2,r3,barrier,support_flag,created_at').order('created_at', { ascending: false }),
+        sb.from('consult_requests').select('id,status'),
+      ]);
+      counselors = (cRes.data ?? []) as Counselor[];
+      students = (sRes.data ?? []) as StudentRow[];
+      codes = (codeRes.data ?? []) as Code[];
+      slots = (slotRes.data ?? []) as Slot[];
+      reflections = (reflRes.data ?? []) as ReflRow[];
+      requests = (reqRes.data ?? []) as ReqRow[];
+      if (cRes.error) dbError = `DB Error: ${cRes.error.message}`;
+    } else {
+      // tab === 'siswa'
+      const [cRes, sRes, codeRes, planRes, quizRes, reflRes, dayRes] = await Promise.all([
+        sb.from('counselors').select('user_id,name,school_name,created_at'),
+        sb.from('students').select('id,nickname,class,school_code,consent_at,share_summary,include_reflection,created_at').order('created_at', { ascending: false }),
+        sb.from('school_codes').select('code,owner_id,note,active,created_at'),
+        sb.from('student_plans').select('*'),
+        sb.from('quiz_attempts').select('id,student_id,score,total,created_at').order('created_at', { ascending: false }),
+        sb.from('reflections').select('id,student_id,r1,r2,r3,barrier,support_flag,created_at').order('created_at', { ascending: false }),
+        sb.from('practice_days').select('student_id,day'),
+      ]);
+      counselors = (cRes.data ?? []) as Counselor[];
+      students = (sRes.data ?? []) as StudentRow[];
+      codes = (codeRes.data ?? []) as Code[];
+      plans = (planRes.data ?? []) as PlanRow[];
+      quizzes = (quizRes.data ?? []) as QuizRow[];
+      reflections = (reflRes.data ?? []) as ReflRow[];
+      practiceDays = (dayRes.data ?? []) as Array<{ student_id: string; day: string }>;
+    }
   } catch (e) {
     console.error('[AdminPage] Gagal memuat data:', e);
     dbError = `Gagal memuat data dari Supabase. (${e})`;
