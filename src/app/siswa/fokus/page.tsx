@@ -20,7 +20,7 @@ export default async function Fokus({ searchParams }: { searchParams: Promise<{ 
   return (
     <>
       <div style={{ background: 'var(--grad)', borderRadius: 'var(--r-lg)', padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.6)' }}>⚡ Pelaksanaan</span>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.6)' }}>Pelaksanaan</span>
         <h2 style={{ color: '#fff', margin: 0, fontSize: 24 }}>Kurangi gangguan, satu rencana saja.</h2>
         <p style={{ color: 'rgba(255,255,255,.75)', margin: 0, fontSize: 15, lineHeight: 1.6, maxWidth: 500 }}>
           Susun rencana konkret untuk mengurangi gangguan saat belajar.

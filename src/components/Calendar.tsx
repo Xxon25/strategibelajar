@@ -21,7 +21,7 @@ export default function Calendar({ days }: { days: string[] }) {
   return (
     <div className="card" style={{ gap: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-        <h3 style={{ margin: 0 }}>📅 Progresku · {m.label}</h3>
+        <h3 style={{ margin: 0 }}>Progresku · {m.label}</h3>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
           <span style={{ fontFamily: 'var(--fd)', fontSize: 28, fontWeight: 800, color: 'var(--accent)', lineHeight: 1 }}>{m.n}</span>
           <span style={{ fontSize: 13, color: 'var(--muted)' }}>hari berlatih</span>

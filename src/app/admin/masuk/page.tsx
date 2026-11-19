@@ -18,9 +18,9 @@ export default function AdminMasuk() {
             <div style={{
               width: '48px', height: '48px', borderRadius: '14px',
               background: 'linear-gradient(135deg,#4f46e5,#7c3aed)',
-              display: 'grid', placeItems: 'center', fontSize: '24px',
+              display: 'grid', placeItems: 'center',
               marginBottom: '16px',
-            }}>⚙️</div>
+            }} />
             <span className="eyebrow">Super Admin</span>
             <h2 style={{ fontSize: '22px', fontWeight: 800, marginTop: 4 }}>Masuk ke Panel Admin</h2>
           </div>

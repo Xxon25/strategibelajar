@@ -55,17 +55,17 @@ export default async function Refleksi({ searchParams }: { searchParams: Promise
               <DraftTextarea id="r1" name="r1" storageKey="rsb-draft-r1" placeholder="Strategi atau kebiasaan yang berhasil kamu lakukan..." />
             </div>
             <div>
-              <label className="q" htmlFor="r2">🧱 Apa kendalanya?</label>
+              <label className="q" htmlFor="r2">Apa kendalanya?</label>
               <DraftTextarea id="r2" name="r2" storageKey="rsb-draft-r2" placeholder="Hal yang sulit atau hambatan yang kamu temui..." />
             </div>
             <div>
-              <label className="q" htmlFor="r3">🔄 Apa penyesuaian untuk minggu depan?</label>
+              <label className="q" htmlFor="r3">Apa penyesuaian untuk minggu depan?</label>
               <DraftTextarea id="r3" name="r3" storageKey="rsb-draft-r3" placeholder="Apa yang akan kamu ubah atau coba lebih..." />
             </div>
           </div>
 
           <div className="card">
-            <h3>🧭 Hambatan belajarmu masih berlanjut?</h3>
+            <h3>Hambatan belajarmu masih berlanjut?</h3>
             <fieldset style={{ gap: 10 }}>
               {(Object.keys(BARRIER) as Array<keyof typeof BARRIER>).map((k) => (
                 <label key={k} className="choice">
@@ -86,7 +86,7 @@ export default async function Refleksi({ searchParams }: { searchParams: Promise
 
           {d.reflections.length > 0 && (
             <details className="card">
-              <summary>📜 Refleksi sebelumnya ({d.reflections.length})</summary>
+              <summary>Refleksi sebelumnya ({d.reflections.length})</summary>
               <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>
                 {d.reflections.map((r) => (
                   <div key={r.id} style={{

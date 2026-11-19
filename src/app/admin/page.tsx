@@ -170,13 +170,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     return true;
   });
 
-  const tabs: Array<[Tab, string, string, number | undefined]> = [
-    ['overview', '📊', 'Overview', undefined],
-    ['view', '👁️', 'Lihat View Guru & Murid', undefined],
-    ['guru', '👩‍🏫', 'Guru BK', counselors.length],
-    ['siswa', '🎒', 'Siswa', students.length],
-    ['konsul', '📅', 'Konsultasi & Refleksi', baruCount || undefined],
-    ['konten', '✏️', 'Edit Konten', undefined],
+  const tabs: Array<[Tab, string, number | undefined]> = [
+    ['overview', 'Overview', undefined],
+    ['view', 'Lihat View Guru & Murid', undefined],
+    ['guru', 'Guru BK', counselors.length],
+    ['siswa', 'Siswa', students.length],
+    ['konsul', 'Konsultasi & Refleksi', baruCount || undefined],
+    ['konten', 'Edit Konten', undefined],
   ];
 
   const contentKeys: Array<[string, string, string]> = [
@@ -199,7 +199,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         <select name="user_id" required style={{ flex: 1, padding: '8px 12px', fontSize: 13 }}>
           {counselors.map((c) => <option key={c.user_id} value={c.user_id}>{c.name} — {c.school_name}</option>)}
         </select>
-        <button type="submit" style={btnIndigo}>👁️ Buka View Guru →</button>
+        <button type="submit" style={btnIndigo}>Buka View Guru →</button>
       </form>
     )
   );
@@ -212,7 +212,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         <select name="student_id" required style={{ flex: 1, padding: '8px 12px', fontSize: 13 }}>
           {students.map((s) => <option key={s.id} value={s.id}>{s.nickname} (Kelas {s.class} · {s.school_code})</option>)}
         </select>
-        <button type="submit" style={btnCoral}>👁️ Buka View Murid →</button>
+        <button type="submit" style={btnCoral}>Buka View Murid →</button>
       </form>
     )
   );
@@ -222,14 +222,14 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       {/* ── Topbar ── */}
       <div className="topbar" style={{ background: 'var(--grad-admin)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,255,255,.15)', display: 'grid', placeItems: 'center', fontSize: 17 }}>⚙️</div>
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,255,255,.15)', display: 'grid', placeItems: 'center', fontSize: 17 }} />
           <div>
             <b style={{ color: '#fff', display: 'block', lineHeight: 1.1 }}>Panel Super Admin · RSB</b>
             <span style={{ fontSize: 11, color: 'rgba(255,255,255,.6)' }}>Kontrol Guru BK, Siswa &amp; Preview View</span>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <Link href="/" style={{ padding: '5px 12px', borderRadius: 8, background: 'rgba(255,255,255,.12)', color: '#fff', fontSize: 12, fontWeight: 700 }}>🏠 Beranda</Link>
+          <Link href="/" style={{ padding: '5px 12px', borderRadius: 8, background: 'rgba(255,255,255,.12)', color: '#fff', fontSize: 12, fontWeight: 700 }}>Beranda</Link>
           <span style={{ fontSize: 13, color: 'rgba(255,255,255,.75)', fontWeight: 600 }}>Halo, {a.name}</span>
           <form action={logoutAdmin}>
             <button className="btn link" type="submit" style={{ color: '#fca5a5', fontSize: 13 }}>Keluar</button>
@@ -240,15 +240,15 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       <main className="screen">
         {dbError && (
           <div className="note" style={{ fontFamily: 'monospace', fontSize: 13 }}>
-            <span className="big">⚠️ Database belum siap</span>
+            <span className="big">Database belum siap</span>
             {dbError}
           </div>
         )}
-        {sp.ok && <div className="note good">✅ Perubahan berhasil disimpan.</div>}
+        {sp.ok && <div className="note good">Perubahan berhasil disimpan.</div>}
 
         {/* ── Tabs ── */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', borderBottom: '2px solid var(--line)', paddingBottom: 12 }}>
-          {tabs.map(([k, icon, label, badge]) => {
+          {tabs.map(([k, label, badge]) => {
             const on = tab === k;
             return (
               <Link key={k} href={`/admin?tab=${k}`} style={{
@@ -259,7 +259,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', gap: 7,
                 boxShadow: on ? '0 4px 12px rgba(79,70,229,.25)' : 'var(--shadow-sm)',
               }}>
-                <span>{icon}</span><span>{label}</span>
+                <span>{label}</span>
                 {badge !== undefined && (
                   <span style={{ fontSize: 11, fontWeight: 800, padding: '1px 7px', borderRadius: 99, background: on ? 'rgba(255,255,255,.22)' : 'var(--surface2)', color: on ? '#fff' : 'var(--accent)' }}>{badge}</span>
                 )}
@@ -278,15 +278,14 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: 12 }}>
               {[
-                { icon: '👩‍🏫', val: counselors.length, label: 'Guru BK', color: '#4f46e5', bg: '#eef2ff' },
-                { icon: '🎒', val: students.length, label: 'Total Siswa', color: '#e8524a', bg: '#fff0ef' },
-                { icon: '✅', val: students.filter((s) => s.consent_at).length, label: 'Siswa Consent', color: '#2a9d8f', bg: '#e8f7f5' },
-                { icon: '🔑', val: codes.filter((c) => c.active).length, label: 'Kode Aktif', color: '#d97706', bg: '#fffbeb' },
-                { icon: '🪞', val: reflections.length, label: 'Refleksi', color: '#7c5cbf', bg: '#f3eeff' },
-                { icon: '📅', val: requests.length, label: `Konsultasi (${baruCount} baru)`, color: '#0284c7', bg: '#f0f9ff' },
+                { val: counselors.length, label: 'Guru BK', color: '#4f46e5', bg: '#eef2ff' },
+                { val: students.length, label: 'Total Siswa', color: '#e8524a', bg: '#fff0ef' },
+                { val: students.filter((s) => s.consent_at).length, label: 'Siswa Consent', color: '#2a9d8f', bg: '#e8f7f5' },
+                { val: codes.filter((c) => c.active).length, label: 'Kode Aktif', color: '#d97706', bg: '#fffbeb' },
+                { val: reflections.length, label: 'Refleksi', color: '#7c5cbf', bg: '#f3eeff' },
+                { val: requests.length, label: `Konsultasi (${baruCount} baru)`, color: '#0284c7', bg: '#f0f9ff' },
               ].map((st) => (
                 <div key={st.label} className="card" style={{ borderTop: `3px solid ${st.color}`, padding: '16px 18px', flexDirection: 'row', alignItems: 'center', gap: 13 }}>
-                  <span style={{ width: 44, height: 44, borderRadius: 12, background: st.bg, display: 'grid', placeItems: 'center', fontSize: 21, flexShrink: 0 }}>{st.icon}</span>
                   <div>
                     <div style={{ fontFamily: 'var(--fd)', fontSize: 26, fontWeight: 800, color: st.color, lineHeight: 1 }}>{st.val}</div>
                     <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 3, fontWeight: 600 }}>{st.label}</div>
@@ -299,21 +298,21 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <div className="card" style={{ background: 'linear-gradient(135deg,#eef2ff,#f5f3ff)', border: '1.5px solid #c7d2fe', padding: '22px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
                 <div>
-                  <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.08em', color: '#4f46e5' }}>👁️ Simulasi Tampilan</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.08em', color: '#4f46e5' }}>Simulasi Tampilan</span>
                   <h3 style={{ fontSize: 18, marginTop: 2, color: '#1e1b4b' }}>Lihat dari sudut pandang Guru BK atau Murid</h3>
                 </div>
                 <form action={createDemoStudent}>
-                  <button type="submit" style={{ ...btnCoral, background: 'var(--grad)' }}>🚀 Masuk View Siswa Demo</button>
+                  <button type="submit" style={{ ...btnCoral, background: 'var(--grad)' }}>Masuk View Siswa Demo</button>
                 </form>
               </div>
               <style>{`@media(min-width:760px){.preview-split{display:grid!important;grid-template-columns:1fr 1fr;gap:16px}}`}</style>
               <div className="preview-split" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <div style={{ background: '#fff', padding: '16px 18px', borderRadius: 14, border: '1px solid #e0e7ff', display: 'grid', gap: 10 }}>
-                  <div style={{ fontWeight: 800, fontSize: 15, color: '#1e1b4b' }}>🏫 View Guru BK</div>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: '#1e1b4b' }}>View Guru BK</div>
                   {GuruPicker}
                 </div>
                 <div style={{ background: '#fff', padding: '16px 18px', borderRadius: 14, border: '1px solid #fad9d7', display: 'grid', gap: 10 }}>
-                  <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--ink2)' }}>🎒 View Murid</div>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--ink2)' }}>View Murid</div>
                   {StudentPicker}
                 </div>
               </div>
@@ -321,7 +320,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
             {supportAlerts.length > 0 && (
               <div className="note" style={{ display: 'grid', gap: 8 }}>
-                <span className="big">🚨 {supportAlerts.length} refleksi perlu perhatian</span>
+                <span className="big">{supportAlerts.length} refleksi perlu perhatian</span>
                 {supportAlerts.slice(0, 5).map((r) => {
                   const st = studentById.get(r.student_id);
                   return (
@@ -330,7 +329,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       {st && (
                         <form action={previewStudent}>
                           <input type="hidden" name="student_id" value={st.id} />
-                          <button type="submit" className="chip warn" style={{ cursor: 'pointer' }}>👁️ Lihat View Siswa</button>
+                          <button type="submit" className="chip warn" style={{ cursor: 'pointer' }}>Lihat View Siswa</button>
                         </form>
                       )}
                     </div>
@@ -340,7 +339,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             )}
 
             <div className="card">
-              <h3>🏫 Sekolah &amp; Guru BK</h3>
+              <h3>Sekolah &amp; Guru BK</h3>
               {counselors.length === 0 ? (
                 <p className="muted">Belum ada guru BK.</p>
               ) : (
@@ -356,7 +355,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                         </span>
                         <form action={previewGuru}>
                           <input type="hidden" name="user_id" value={c.user_id} />
-                          <button type="submit" style={{ padding: '6px 12px', borderRadius: 8, background: '#eef2ff', color: '#4f46e5', border: '1px solid #c7d2fe', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>👁️ Lihat View Guru</button>
+                          <button type="submit" style={{ padding: '6px 12px', borderRadius: 8, background: '#eef2ff', color: '#4f46e5', border: '1px solid #c7d2fe', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Lihat View Guru</button>
                         </form>
                       </div>
                     );
@@ -372,7 +371,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <>
             <div>
               <span className="eyebrow" style={{ color: '#4f46e5' }}>Simulasi &amp; Inspeksi</span>
-              <h2>👁️ Lihat View Guru BK &amp; Murid</h2>
+              <h2>Lihat View Guru BK &amp; Murid</h2>
               <p className="lead" style={{ marginTop: 4 }}>
                 Masuk ke tampilan Guru BK atau Murid persis seperti yang mereka lihat. Banner ungu di atas halaman bisa dipakai untuk kembali ke Panel Admin kapan saja. Sesi asli mereka tidak terganggu.
               </p>
@@ -381,7 +380,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <style>{`@media(min-width:820px){.view-grid{display:grid!important;grid-template-columns:1fr 1fr;gap:20px;align-items:start}}`}</style>
             <div className="view-grid" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div className="card" style={{ borderTop: '4px solid #4f46e5' }}>
-                <h3 style={{ fontSize: 18 }}>👩‍🏫 Dashboard Guru BK</h3>
+                <h3 style={{ fontSize: 18 }}>Dashboard Guru BK</h3>
                 {counselors.length === 0 ? (
                   <div className="note">Belum ada Guru BK.</div>
                 ) : (
@@ -397,7 +396,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                           </div>
                           <form action={previewGuru}>
                             <input type="hidden" name="user_id" value={c.user_id} />
-                            <button type="submit" style={btnIndigo}>👁️ Masuk →</button>
+                            <button type="submit" style={btnIndigo}>Masuk →</button>
                           </form>
                         </div>
                       );
@@ -408,9 +407,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
               <div className="card" style={{ borderTop: '4px solid var(--accent)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                  <h3 style={{ fontSize: 18 }}>🎒 Aplikasi Murid</h3>
+                  <h3 style={{ fontSize: 18 }}>Aplikasi Murid</h3>
                   <form action={createDemoStudent}>
-                    <button type="submit" style={{ ...btnCoral, background: 'var(--grad)', fontSize: 12 }}>🚀 Siswa Demo</button>
+                    <button type="submit" style={{ ...btnCoral, background: 'var(--grad)', fontSize: 12 }}>Siswa Demo</button>
                   </form>
                 </div>
                 {students.length === 0 ? (
@@ -429,12 +428,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                               <code style={{ fontSize: 11, color: 'var(--muted)' }}>{s.school_code}</code>
                             </div>
                             <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 3 }}>
-                              {s.consent_at ? '✅ Consent' : '⏳ Belum consent'} · {p?.goal ? '🎯 Ada tujuan' : 'Belum tujuan'} · {q ? `🧠 ${q.score}/${q.total}` : 'Belum kuis'} · 🪞 {(reflsByStudent.get(s.id) ?? []).length}
+                              {s.consent_at ? 'Consent' : 'Belum consent'} · {p?.goal ? 'Ada tujuan' : 'Belum tujuan'} · {q ? `${q.score}/${q.total}` : 'Belum kuis'} · {(reflsByStudent.get(s.id) ?? []).length} refleksi
                             </div>
                           </div>
                           <form action={previewStudent}>
                             <input type="hidden" name="student_id" value={s.id} />
-                            <button type="submit" style={btnCoral}>👁️ Masuk →</button>
+                            <button type="submit" style={btnCoral}>Masuk →</button>
                           </form>
                         </div>
                       );
@@ -470,14 +469,14 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                       <form action={previewGuru}>
                         <input type="hidden" name="user_id" value={c.user_id} />
-                        <button type="submit" style={btnIndigo}>👁️ Lihat View</button>
+                        <button type="submit" style={btnIndigo}>Lihat View</button>
                       </form>
                       <DeleteCounselorForm userId={c.user_id} name={c.name} />
                     </div>
                   </div>
                   <div className="guru-sub" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     <div style={{ padding: '14px 16px', borderRadius: 12, background: 'var(--surface2)', border: '1px solid var(--line)', display: 'grid', gap: 8 }}>
-                      <b style={{ fontSize: 13 }}>🔑 Kode Sekolah ({oc.length})</b>
+                      <b style={{ fontSize: 13 }}>Kode Sekolah ({oc.length})</b>
                       {oc.map((x) => (
                         <div key={x.code} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#fff', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--line)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -499,7 +498,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       </form>
                     </div>
                     <div style={{ padding: '14px 16px', borderRadius: 12, background: 'var(--surface2)', border: '1px solid var(--line)', display: 'grid', gap: 8 }}>
-                      <b style={{ fontSize: 13 }}>🕐 Jadwal Konsultasi ({os.length})</b>
+                      <b style={{ fontSize: 13 }}>Jadwal Konsultasi ({os.length})</b>
                       {os.map((sl) => (
                         <div key={sl.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#fff', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--line)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -577,13 +576,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                             <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>Share: <b>{s.share_summary ? (s.include_reflection ? 'Ya + refleksi' : 'Ya') : 'Tidak'}</b></div>
                           </td>
                           <td style={{ fontSize: 12 }}>
-                            <div>📅 {daysByStudent.get(s.id) ?? 0} hari</div>
-                            <div>🧠 {q ? `${q.score}/${q.total || QUIZ.length}` : '–'}</div>
-                            <div>🪞 {rs.length}x</div>
+                            <div>{daysByStudent.get(s.id) ?? 0} hari</div>
+                            <div>{q ? `${q.score}/${q.total || QUIZ.length}` : '–'}</div>
+                            <div>{rs.length}x refleksi</div>
                           </td>
                           <td>
                             <details>
-                              <summary style={{ fontSize: 12, color: '#4f46e5' }}>📋 Lihat</summary>
+                              <summary style={{ fontSize: 12, color: '#4f46e5' }}>Lihat</summary>
                               <div style={{ marginTop: 8, padding: '10px 12px', borderRadius: 10, background: 'var(--surface2)', border: '1px solid var(--line)', display: 'grid', gap: 5, fontSize: 12, maxWidth: 340 }}>
                                 <div><b>Kebiasaan:</b> {p?.habit_focus ? habitLabel(p.habit_focus) : '–'}</div>
                                 <div><b>Tujuan:</b> {p?.goal || '–'}</div>
@@ -605,7 +604,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                             <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
                               <form action={previewStudent}>
                                 <input type="hidden" name="student_id" value={s.id} />
-                                <button type="submit" style={{ ...btnIndigo, fontSize: 12, padding: '6px 12px' }}>👁️ View</button>
+                                <button type="submit" style={{ ...btnIndigo, fontSize: 12, padding: '6px 12px' }}>View</button>
                               </form>
                               <DeleteStudentForm id={s.id} nickname={s.nickname} />
                             </div>
@@ -620,7 +619,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
             {codes.length > 0 && (
               <div className="card">
-                <h3>🗑️ Hapus semua siswa per kode sekolah</h3>
+                <h3>Hapus semua siswa per kode sekolah</h3>
                 <DeleteAllStudentsForm codes={codes.map((c) => ({ code: c.code, note: c.note, count: studentsByCode.get(c.code) ?? 0 }))} />
               </div>
             )}
@@ -636,7 +635,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             </div>
 
             <div className="card">
-              <h3>📅 Permintaan Konsultasi ({requests.length})</h3>
+              <h3>Permintaan Konsultasi ({requests.length})</h3>
               {requests.length === 0 ? (
                 <p className="muted">Belum ada permintaan.</p>
               ) : (
@@ -670,7 +669,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             </div>
 
             <div className="card">
-              <h3>🪞 Refleksi Terbaru ({reflections.length})</h3>
+              <h3>Refleksi Terbaru ({reflections.length})</h3>
               {reflections.length === 0 ? (
                 <p className="muted">Belum ada refleksi.</p>
               ) : (
@@ -683,7 +682,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                           <b>{s?.nickname ?? 'Siswa'}</b>
                           <span className="chip" style={{ fontSize: 11 }}>Kelas {s?.class ?? '-'}</span>
                           <span className="chip ok" style={{ fontSize: 11 }}>{BARRIER[r.barrier]?.short}</span>
-                          {r.support_flag && <span className="chip warn" style={{ fontSize: 11 }}>🚨 Perlu perhatian</span>}
+                          {r.support_flag && <span className="chip warn" style={{ fontSize: 11 }}>Perlu perhatian</span>}
                         </div>
                         {r.r1 && <p style={{ fontSize: 13 }}><b>Berhasil:</b> {r.r1}</p>}
                         {r.r2 && <p style={{ fontSize: 13 }}><b>Kendala:</b> {r.r2}</p>}
@@ -727,7 +726,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   </div>
                 ))}
               </div>
-              <Submit pendingText="Menyimpan…">💾 Simpan Semua Perubahan</Submit>
+              <Submit pendingText="Menyimpan…">Simpan Semua Perubahan</Submit>
             </form>
           </>
         )}

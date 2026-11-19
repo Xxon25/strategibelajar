@@ -24,7 +24,7 @@ export default async function Strategi({ searchParams }: { searchParams: Promise
     <>
       <div style={{ background: 'var(--grad)', borderRadius: 'var(--r-lg)', padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
         <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.65)' }}>
-          ⚡ Pelaksanaan · Langkah 1 dari 2
+          Pelaksanaan · Langkah 1 dari 2
         </span>
         <h2 style={{ color: '#fff', margin: 0, fontSize: 24 }}>Latihan mengingat kembali.</h2>
         <p style={{ color: 'rgba(255,255,255,.78)', margin: 0, fontSize: 15, lineHeight: 1.6, maxWidth: 540 }}>
@@ -37,7 +37,6 @@ export default async function Strategi({ searchParams }: { searchParams: Promise
       {/* Info card */}
       <div className="card">
         <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-          <span style={{ fontSize: 24, flexShrink: 0 }}>📚</span>
           <div>
             <h3 style={{ marginBottom: 6 }}>Latihan mengingat kembali</h3>
             <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6 }}>
@@ -54,7 +53,6 @@ export default async function Strategi({ searchParams }: { searchParams: Promise
       {/* Pilih strategi */}
       <form action={saveStrategies} className="card">
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ fontSize: 20 }}>⚡</span>
           <h3>Strategi yang ingin kamu coba minggu ini</h3>
         </div>
         <fieldset>
@@ -74,7 +72,6 @@ export default async function Strategi({ searchParams }: { searchParams: Promise
       {/* Kuis */}
       <div className="card" style={{ borderColor: 'var(--accent)', borderWidth: 1.5 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ fontSize: 20 }}>🧠</span>
           <div>
             <h3>Kuis mandiri</h3>
             <p className="small" style={{ marginTop: 2 }}>Tanpa penilaian — hanya untuk melatih ingatan</p>

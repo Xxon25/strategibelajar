@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Panduan Ruang Strategi Belajar</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.65;
+    color: #1a1a1a;
+    background: #fff;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 56px;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 72px 56px;
+    background: linear-gradient(160deg, #e8524a 0%, #c73b35 60%, #7c5cbf 100%);
+    color: #fff;
+    page-break-after: always;
+  }
+  .cover-eyebrow {
+    font-size: 10pt;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    opacity: .7;
+    margin-bottom: 16px;
+  }
+  .cover h1 {
+    font-size: 36pt;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .cover-sub {
+    font-size: 14pt;
+    opacity: .85;
+    max-width: 480px;
+    margin-bottom: 40px;
+    line-height: 1.6;
+  }
+  .cover-meta {
+    font-size: 10pt;
+    opacity: .6;
+    margin-top: auto;
+  }
+  .cover-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 99px;
+    border: 1px solid rgba(255,255,255,.35);
+    background: rgba(255,255,255,.12);
+    font-size: 10pt;
+    font-weight: 600;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+
+  /* ── TOC ── */
+  .toc-page {
+    page-break-after: always;
+    padding: 56px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .toc-title {
+    font-size: 20pt;
+    font-weight: 800;
+    color: #e8524a;
+    margin-bottom: 28px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #e8524a;
+  }
+  .toc-section {
+    margin-bottom: 6px;
+  }
+  .toc-section a {
+    text-decoration: none;
+    color: #1a1a1a;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px dotted #ddd;
+  }
+  .toc-section a:hover { color: #e8524a; }
+  .toc-section .toc-num { color: #aaa; font-size: 10pt; }
+  .toc-group { font-size: 9pt; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: #aaa; margin: 20px 0 8px; }
+
+  /* ── Sections ── */
+  h2.section-title {
+    font-size: 20pt;
+    font-weight: 800;
+    color: #e8524a;
+    margin-bottom: 6px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #e8524a;
+  }
+  .section-eyebrow {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin-bottom: 8px;
+    display: block;
+  }
+  h3 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 28px 0 10px;
+  }
+  h4 {
+    font-size: 11pt;
+    font-weight: 700;
+    margin: 18px 0 6px;
+    color: #333;
+  }
+  p { margin-bottom: 10px; }
+  ul, ol { padding-left: 22px; margin-bottom: 12px; }
+  li { margin-bottom: 5px; }
+  strong { font-weight: 700; }
+
+  /* ── Cards ── */
+  .card {
+    border: 1.5px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 16px 0;
+    background: #fafafa;
+  }
+  .card-accent {
+    border-left: 4px solid #e8524a;
+    border-radius: 0 12px 12px 0;
+    background: #fff8f7;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+  .card-blue {
+    border-left: 4px solid #4f46e5;
+    border-radius: 0 12px 12px 0;
+    background: #f5f5ff;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+  .card-green {
+    border-left: 4px solid #2a9d8f;
+    border-radius: 0 12px 12px 0;
+    background: #f0faf8;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+  .card-warn {
+    border-left: 4px solid #d97706;
+    border-radius: 0 12px 12px 0;
+    background: #fffbeb;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+  .note {
+    background: #fff3f2;
+    border: 1px solid #fad9d7;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 10.5pt;
+  }
+
+  /* ── Steps ── */
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin: 12px 0;
+  }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e8524a;
+    color: #fff;
+    font-weight: 800;
+    font-size: 11pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-num.blue { background: #4f46e5; }
+  .step-num.green { background: #2a9d8f; }
+
+  /* ── Code ── */
+  code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    background: #f4f4f4;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 9.5pt;
+    color: #c73b35;
+  }
+  pre {
+    font-family: 'Consolas', 'Courier New', monospace;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 9pt;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 14px 0;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  /* ── Table ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 10pt;
+  }
+  th {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 9px 12px;
+    text-align: left;
+    font-weight: 700;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  /* ── Badge/chip ── */
+  .chip {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-size: 9pt;
+    font-weight: 700;
+    background: #f0f0f0;
+    color: #555;
+    margin: 1px 3px;
+  }
+  .chip.red { background: #fff0ef; color: #e8524a; }
+  .chip.green { background: #e8f7f5; color: #2a9d8f; }
+  .chip.purple { background: #f3eeff; color: #7c5cbf; }
+  .chip.blue { background: #eef2ff; color: #4f46e5; }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 24px 0;
+  }
+  .page-break { page-break-after: always; }
+  .section { margin-bottom: 40px; }
+
+  /* ── Print ── */
+  @media print {
+    body { font-size: 10.5pt; }
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    pre { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page-break { page-break-after: always; }
+    h2.section-title { page-break-before: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     COVER
+══════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-eyebrow">Dokumentasi Teknis &amp; Panduan Pengguna</div>
+  <h1>Ruang Strategi<br/>Belajar (RSB)</h1>
+  <p class="cover-sub">
+    Panduan lengkap membangun, mengonfigurasi, dan menggunakan aplikasi bimbingan belajar untuk siswa SMA/MA berbasis Next.js 15 dan Supabase.
+  </p>
+  <div style="margin-bottom: 32px;">
+    <span class="cover-badge">Next.js 15</span>
+    <span class="cover-badge">Supabase</span>
+    <span class="cover-badge">TypeScript</span>
+    <span class="cover-badge">App Router</span>
+  </div>
+  <div class="cover-meta">
+    Versi 1.0 &nbsp;&middot;&nbsp; 2025 &nbsp;&middot;&nbsp; Ruang Strategi Belajar
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     DAFTAR ISI
+══════════════════════════════════════════ -->
+<div class="toc-page">
+  <div class="toc-title">Daftar Isi</div>
+
+  <div class="toc-group">Bagian I — Gambaran Umum</div>
+  <div class="toc-section"><a href="#s1"><span>1. Apa itu RSB?</span><span class="toc-num">3</span></a></div>
+  <div class="toc-section"><a href="#s2"><span>2. Arsitektur Aplikasi</span><span class="toc-num">4</span></a></div>
+  <div class="toc-section"><a href="#s3"><span>3. Peran Pengguna</span><span class="toc-num">5</span></a></div>
+
+  <div class="toc-group">Bagian II — Setup dari Nol</div>
+  <div class="toc-section"><a href="#s4"><span>4. Prasyarat</span><span class="toc-num">6</span></a></div>
+  <div class="toc-section"><a href="#s5"><span>5. Buat Project Supabase</span><span class="toc-num">6</span></a></div>
+  <div class="toc-section"><a href="#s6"><span>6. Jalankan Skema Database</span><span class="toc-num">7</span></a></div>
+  <div class="toc-section"><a href="#s7"><span>7. Buat Akun Admin &amp; Guru BK</span><span class="toc-num">8</span></a></div>
+  <div class="toc-section"><a href="#s8"><span>8. Konfigurasi Environment</span><span class="toc-num">9</span></a></div>
+  <div class="toc-section"><a href="#s9"><span>9. Jalankan Secara Lokal</span><span class="toc-num">9</span></a></div>
+  <div class="toc-section"><a href="#s10"><span>10. Deploy ke Produksi</span><span class="toc-num">10</span></a></div>
+
+  <div class="toc-group">Bagian III — Panduan Penggunaan</div>
+  <div class="toc-section"><a href="#s11"><span>11. Alur Siswa</span><span class="toc-num">11</span></a></div>
+  <div class="toc-section"><a href="#s12"><span>12. Alur Guru BK</span><span class="toc-num">14</span></a></div>
+  <div class="toc-section"><a href="#s13"><span>13. Panel Admin</span><span class="toc-num">16</span></a></div>
+
+  <div class="toc-group">Bagian IV — Referensi Teknis</div>
+  <div class="toc-section"><a href="#s14"><span>14. Skema Database</span><span class="toc-num">18</span></a></div>
+  <div class="toc-section"><a href="#s15"><span>15. Struktur Folder</span><span class="toc-num">20</span></a></div>
+  <div class="toc-section"><a href="#s16"><span>16. Keamanan &amp; Privasi</span><span class="toc-num">21</span></a></div>
+  <div class="toc-section"><a href="#s17"><span>17. Keterbatasan &amp; Catatan</span><span class="toc-num">22</span></a></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     BAB 1
+══════════════════════════════════════════ -->
+<div class="page">
+  <div class="section" id="s1">
+    <span class="section-eyebrow">Bagian I — Gambaran Umum</span>
+    <h2 class="section-title">1. Apa itu RSB?</h2>
+
+    <p>
+      <strong>Ruang Strategi Belajar (RSB)</strong> adalah aplikasi web bimbingan belajar mandiri untuk siswa SMA/MA. Aplikasi ini dirancang untuk membantu siswa mengenali kebiasaan belajar mereka, menetapkan tujuan mingguan, mempraktikkan strategi belajar yang terbukti efektif, dan merefleksikan hasilnya — semua dengan pendampingan dari Guru BK sekolah.
+    </p>
+
+    <div class="card-accent">
+      <strong>Prinsip utama:</strong> data minimal, privasi siswa diutamakan. Siswa menentukan sendiri apa yang ingin dibagikan ke Guru BK. Tidak ada kata sandi untuk siswa, tidak ada iklan, tidak ada pelacak pihak ketiga.
+    </div>
+
+    <h3>Fitur Utama</h3>
+
+    <table>
+      <tr>
+        <th>Peran</th>
+        <th>Fitur</th>
+      </tr>
+      <tr>
+        <td><span class="chip red">Siswa</span></td>
+        <td>
+          Daftar dengan nama panggilan + kelas + kode sekolah &middot;
+          Persetujuan data &middot;
+          Kenali Kebiasaan &middot;
+          Tetapkan Tujuan &middot;
+          Jadwal Ulang Bertahap &middot;
+          Strategi Belajar &amp; Kuis Mandiri &middot;
+          Fokus Belajar &middot;
+          Refleksi Mingguan &middot;
+          Ajukan Jadwal Konsultasi &middot;
+          Hapus Data Sendiri
+        </td>
+      </tr>
+      <tr>
+        <td><span class="chip green">Guru BK</span></td>
+        <td>
+          Login email &amp; kata sandi &middot;
+          Dashboard siswa (filter kelas/hambatan) &middot;
+          Hanya data yang siswa izinkan &middot;
+          Kelola kode sekolah &middot;
+          Kelola jadwal konsultasi &middot;
+          Ubah status permintaan konsultasi
+        </td>
+      </tr>
+      <tr>
+        <td><span class="chip blue">Admin</span></td>
+        <td>
+          Panel super admin &middot;
+          Tambah/hapus Guru BK &middot;
+          Lihat semua data &middot;
+          Preview tampilan siswa/guru &middot;
+          Edit konten teks halaman &middot;
+          Kelola kode &amp; jadwal semua guru
+        </td>
+      </tr>
+    </table>
+
+    <h3>Strategi Belajar yang Didukung</h3>
+    <p>RSB mempromosikan strategi yang didukung riset (Dunlosky et al., 2013):</p>
+    <ul>
+      <li><strong>Latihan mengingat kembali</strong> — menjawab soal tanpa melihat catatan</li>
+      <li><strong>Belajar terdistribusi</strong> — ulang materi pada hari ke-1, 3, 7, dan 14</li>
+      <li><strong>Meringkas dengan kata sendiri</strong></li>
+      <li><strong>SQ3R</strong> — Survey, Question, Read, Recite, Review</li>
+      <li><strong>Catatan Cornell</strong></li>
+    </ul>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="section" id="s2">
+    <h2 class="section-title">2. Arsitektur Aplikasi</h2>
+
+    <p>RSB dibangun di atas dua komponen utama:</p>
+
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0;">
+      <div class="card" style="flex: 1; min-width: 200px;">
+        <h4>Next.js 15 (App Router)</h4>
+        <p>Framework React dengan Server Components. Semua logika bisnis dan akses database berjalan di server — tidak ada secret yang bocor ke browser.</p>
+        <ul>
+          <li>TypeScript</li>
+          <li>Server Actions untuk form</li>
+          <li>Middleware untuk autentikasi</li>
+        </ul>
+      </div>
+      <div class="card" style="flex: 1; min-width: 200px;">
+        <h4>Supabase (Backend)</h4>
+        <p>PostgreSQL terkelola sebagai database, Supabase Auth untuk login Guru BK dan Admin. Semua tabel menggunakan RLS tanpa policy publik.</p>
+        <ul>
+          <li>Service Role Key hanya di server</li>
+          <li>Row Level Security aktif</li>
+          <li>Anon Key hanya untuk inisialisasi</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Alur Data</h3>
+    <div class="card-blue">
+      <strong>Browser</strong> → Server Action / Route Handler → <strong>Supabase (service role)</strong> → Database
+    </div>
+    <p>Tidak ada request langsung dari browser ke Supabase untuk data sensitif. Semua melewati server Next.js yang memvalidasi sesi terlebih dahulu.</p>
+
+    <h3>Sesi Siswa</h3>
+    <p>Siswa tidak memiliki kata sandi. Sesi dibuat dengan token acak (<code>crypto.randomBytes</code>) yang disimpan di cookie <code>httpOnly; SameSite=Strict</code>. Hanya hash SHA-256 dari token yang tersimpan di database — sehingga data tidak bisa diidentifikasi ulang meskipun database bocor.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     BAB 3
+══════════════════════════════════════════ -->
+<div class="page">
+  <div class="section" id="s3">
+    <h2 class="section-title">3. Peran Pengguna</h2>
+
+    <h3>Siswa</h3>
+    <p>Daftar dengan nama panggilan, kelas, dan kode sekolah dari Guru BK. Tidak ada kata sandi. Data terikat ke perangkat yang digunakan mendaftar — gunakan perangkat yang sama untuk melanjutkan.</p>
+
+    <h3>Guru BK</h3>
+    <p>Login dengan email dan kata sandi yang dibuat oleh Admin melalui Panel Admin atau langsung di Supabase Dashboard. Guru BK hanya bisa melihat siswa yang terdaftar dengan kode sekolah miliknya.</p>
+
+    <h3>Admin (Super Admin)</h3>
+    <p>Akun admin dibuat manual di Supabase Auth, kemudian UUID-nya didaftarkan di tabel <code>admins</code> via SQL. Admin bisa mengelola semua Guru BK, melihat seluruh data, dan mengedit konten teks halaman utama.</p>
+
+    <div class="note">
+      <strong>Penting:</strong> satu project RSB bisa dipakai oleh banyak sekolah sekaligus. Setiap Guru BK memiliki kode sekolahnya sendiri, dan data antarsiswa dari sekolah berbeda tidak tercampur.
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ══ BAB 4 ══ -->
+  <div class="section" id="s4">
+    <span class="section-eyebrow">Bagian II — Setup dari Nol</span>
+    <h2 class="section-title">4. Prasyarat</h2>
+
+    <p>Pastikan sudah tersedia:</p>
+    <table>
+      <tr><th>Kebutuhan</th><th>Versi / Keterangan</th></tr>
+      <tr><td>Node.js</td><td>18 atau lebih baru (disarankan 20 LTS)</td></tr>
+      <tr><td>npm</td><td>Sudah termasuk di Node.js</td></tr>
+      <tr><td>Git</td><td>Untuk clone repository</td></tr>
+      <tr><td>Akun Supabase</td><td>Gratis di <strong>supabase.com</strong></td></tr>
+      <tr><td>Akun Vercel / hosting</td><td>Opsional, untuk deploy produksi</td></tr>
+    </table>
+  </div>
+
+  <div class="section" id="s5">
+    <h2 class="section-title">5. Buat Project Supabase</h2>
+
+    <div class="step">
+      <div class="step-num blue">1</div>
+      <div>
+        <strong>Buka supabase.com</strong> dan login atau daftar akun baru.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num blue">2</div>
+      <div>
+        Klik <strong>New Project</strong>. Isi nama project (contoh: <em>rsb-prod</em>), pilih region terdekat (Singapore), dan buat database password yang kuat. Simpan password ini.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num blue">3</div>
+      <div>
+        Tunggu project selesai di-provision (sekitar 1–2 menit).
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num blue">4</div>
+      <div>
+        Buka <strong>Project Settings &rarr; API</strong>. Catat tiga nilai berikut — akan dibutuhkan di langkah konfigurasi:
+        <ul style="margin-top: 8px;">
+          <li><code>Project URL</code> — contoh: <code>https://abcdefgh.supabase.co</code></li>
+          <li><code>anon public key</code> — kunci publik untuk inisialisasi client</li>
+          <li><code>service_role key</code> — kunci rahasia, <strong>jangan dibagikan</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     BAB 6 — SKEMA
+══════════════════════════════════════════ -->
+<div class="page">
+  <div class="section" id="s6">
+    <h2 class="section-title">6. Jalankan Skema Database</h2>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>Di Supabase Dashboard, buka menu <strong>SQL Editor</strong> di sidebar kiri.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>Buka file <code>supabase/schema.sql</code> dari folder project RSB, lalu <strong>salin seluruh isinya</strong>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>Paste di SQL Editor Supabase, lalu klik <strong>Run</strong>. Skema sudah menggunakan <code>IF NOT EXISTS</code> sehingga aman dijalankan berulang kali.</div>
+    </div>
+
+    <div class="card-green">
+      <strong>Yang dibuat oleh skema:</strong> tabel admins, site_content, counselors, school_codes, consult_slots, students, student_plans, quiz_attempts, reflections, consult_requests, practice_days — semua dengan RLS aktif.
+    </div>
+
+    <h3>Tabel yang Dibuat</h3>
+    <table>
+      <tr><th>Tabel</th><th>Keterangan</th></tr>
+      <tr><td><code>admins</code></td><td>Super admin, terhubung ke Supabase Auth</td></tr>
+      <tr><td><code>site_content</code></td><td>Teks halaman yang bisa diedit Admin</td></tr>
+      <tr><td><code>counselors</code></td><td>Data Guru BK, terhubung ke Supabase Auth</td></tr>
+      <tr><td><code>school_codes</code></td><td>Kode sekolah, dimiliki satu Guru BK</td></tr>
+      <tr><td><code>consult_slots</code></td><td>Jadwal konsultasi yang ditetapkan Guru BK</td></tr>
+      <tr><td><code>students</code></td><td>Data siswa (nama panggilan, kelas, token hash)</td></tr>
+      <tr><td><code>student_plans</code></td><td>Rencana belajar (kebiasaan, tujuan, jadwal, strategi)</td></tr>
+      <tr><td><code>quiz_attempts</code></td><td>Riwayat pengerjaan kuis</td></tr>
+      <tr><td><code>reflections</code></td><td>Refleksi mingguan siswa</td></tr>
+      <tr><td><code>consult_requests</code></td><td>Permintaan jadwal konsultasi</td></tr>
+      <tr><td><code>practice_days</code></td><td>Tanggal hari berlatih (kalender)</td></tr>
+    </table>
+  </div>
+
+  <div class="section" id="s7">
+    <h2 class="section-title">7. Buat Akun Admin &amp; Guru BK</h2>
+
+    <h3>Membuat Akun Admin</h3>
+
+    <div class="step">
+      <div class="step-num blue">1</div>
+      <div>Di Supabase Dashboard, buka <strong>Authentication &rarr; Users &rarr; Add User</strong>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num blue">2</div>
+      <div>Isi email admin (contoh: <code>admin@rsb.sch.id</code>) dan kata sandi. Klik <strong>Create User</strong>. Catat UUID user yang muncul.</div>
+    </div>
+    <div class="step">
+      <div class="step-num blue">3</div>
+      <div>
+        Kembali ke <strong>SQL Editor</strong>, jalankan query berikut (ganti UUID dan nama):
+        <pre><code>INSERT INTO admins (user_id, name)
+VALUES ('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', 'Super Admin');</code></pre>
+      </div>
+    </div>
+
+    <h3>Membuat Akun Guru BK (via Panel Admin)</h3>
+    <p>Setelah aplikasi berjalan, cara termudah adalah lewat Panel Admin (<code>/admin</code>):</p>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>Login ke <code>/admin/masuk</code> dengan akun admin.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>Buka tab <strong>Guru BK</strong>, lalu isi form <em>Tambah Guru BK Baru</em>: nama, nama sekolah, email login, dan kata sandi awal.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>Klik <strong>Tambah Guru BK</strong>. Sistem otomatis membuat akun di Supabase Auth, mendaftarkan ke tabel <code>counselors</code>, dan membuat satu kode sekolah awal.</div>
+    </div>
+
+    <h3>Membuat Akun Guru BK (via SQL — alternatif)</h3>
+    <p>Jika aplikasi belum jalan, buat akun Guru BK langsung di Supabase:</p>
+    <div class="step">
+      <div class="step-num blue">1</div>
+      <div>Buat user di <strong>Authentication &rarr; Users</strong>. Catat UUID-nya.</div>
+    </div>
+    <div class="step">
+      <div class="step-num blue">2</div>
+      <div>
+        Jalankan di SQL Editor (ganti UUID, nama, nama sekolah, kode, dan catatan):
+        <pre><code>INSERT INTO counselors (user_id, name, school_name)
+  VALUES ('UUID_GURU', 'Ibu Sari', 'SMA Negeri 1 Jakarta');
+
+INSERT INTO school_codes (code, owner_id, note)
+  VALUES ('RSB-01', 'UUID_GURU', 'Kelas X-XII 2025');
+
+INSERT INTO consult_slots (owner_id, label) VALUES
+  ('UUID_GURU', 'Senin, 10.00 - 11.00'),
+  ('UUID_GURU', 'Rabu, 13.00 - 14.00'),
+  ('UUID_GURU', 'Jumat, 09.00 - 10.00');</code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     BAB 8–10
+══════════════════════════════════════════ -->
+<div class="page">
+  <div class="section" id="s8">
+    <h2 class="section-title">8. Konfigurasi Environment</h2>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>Di folder project, salin file contoh:<br/>
+        <code>cp .env.example .env.local</code>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        Buka <code>.env.local</code> dan isi tiga variabel:
+        <pre><code>NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...</code></pre>
+      </div>
+    </div>
+
+    <div class="card-warn">
+      <strong>Perhatian:</strong> <code>SUPABASE_SERVICE_ROLE_KEY</code> adalah kunci dengan hak akses penuh ke database. Jangan pernah commit file <code>.env.local</code> ke repository publik, dan pastikan variabel ini TIDAK memiliki awalan <code>NEXT_PUBLIC_</code> agar tidak dikirim ke browser.
+    </div>
+
+    <table>
+      <tr><th>Variabel</th><th>Sumber</th><th>Aman di browser?</th></tr>
+      <tr><td><code>NEXT_PUBLIC_SUPABASE_URL</code></td><td>Project Settings &rarr; API &rarr; Project URL</td><td>Ya (publik)</td></tr>
+      <tr><td><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td><td>Project Settings &rarr; API &rarr; anon public</td><td>Ya (publik)</td></tr>
+      <tr><td><code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>Project Settings &rarr; API &rarr; service_role</td><td><strong>Tidak</strong> — server only</td></tr>
+    </table>
+  </div>
+
+  <div class="section" id="s9">
+    <h2 class="section-title">9. Jalankan Secara Lokal</h2>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>Install dependensi:<br/><code>npm install</code></div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>Jalankan development server:<br/><code>npm run dev</code></div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>Buka browser di <strong>http://localhost:3000</strong></div>
+    </div>
+
+    <h3>URL Halaman Utama</h3>
+    <table>
+      <tr><th>URL</th><th>Keterangan</th></tr>
+      <tr><td><code>/</code></td><td>Halaman utama — pilih cara masuk</td></tr>
+      <tr><td><code>/daftar</code></td><td>Pendaftaran siswa baru</td></tr>
+      <tr><td><code>/siswa</code></td><td>Dashboard siswa (butuh sesi)</td></tr>
+      <tr><td><code>/guru/masuk</code></td><td>Login Guru BK</td></tr>
+      <tr><td><code>/guru</code></td><td>Dashboard Guru BK (butuh auth)</td></tr>
+      <tr><td><code>/admin/masuk</code></td><td>Login Admin</td></tr>
+      <tr><td><code>/admin</code></td><td>Panel Admin (butuh auth)</td></tr>
+    </table>
+
+    <h3>Perintah Berguna</h3>
+    <pre><code>npm run dev        # development dengan Turbopack
+npm run build      # build produksi
+npm run start      # jalankan hasil build
+npm run typecheck  # cek TypeScript tanpa emit</code></pre>
+  </div>
+
+  <div class="section" id="s10">
+    <h2 class="section-title">10. Deploy ke Produksi</h2>
+
+    <h3>Deploy ke Vercel (Disarankan)</h3>
+    <div class="step">
+      <div class="step-num blue">1</div>
+      <div>Push repository ke GitHub.</div>
+    </div>
+    <div class="step">
+      <div class="step-num blue">2</div>
+      <div>Di <strong>vercel.com</strong>, klik <strong>Add New Project</strong> dan pilih repository.</div>
+    </div>
+    <div class="step">
+      <div class="step-num blue">3</div>
+      <div>Di bagian <strong>Environment Variables</strong>, tambahkan ketiga variabel dari <code>.env.local</code>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num blue">4</div>
+      <div>Klik <strong>Deploy</strong>. Vercel otomatis menjalankan <code>npm run build</code>.</div>
+    </div>
+
+    <div class="card-accent">
+      <strong>Setelah deploy:</strong> pastikan URL produksi (misal <code>https://rsb.vercel.app</code>) sudah ditambahkan ke <strong>Supabase &rarr; Authentication &rarr; URL Configuration &rarr; Redirect URLs</strong> jika menggunakan fitur OAuth atau magic link di masa depan.
+    </div>
+
+    <h3>Checklist Sebelum Produksi</h3>
+    <ul>
+      <li>Semua tiga variabel environment sudah diisi di hosting</li>
+      <li>Skema database sudah dijalankan di Supabase</li>
+      <li>Minimal satu akun admin dan satu Guru BK sudah dibuat</li>
+      <li>Minimal satu kode sekolah aktif sudah ada</li>
+      <li>Test alur siswa: daftar, consent, isi kebiasaan, simpan</li>
+      <li>Test login Guru BK dan pastikan siswa terlihat di dashboard</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     BAB 11 — ALUR SISWA
+══════════════════════════════════════════ -->
+<div class="page">
+  <span class="section-eyebrow">Bagian III — Panduan Penggunaan</span>
+  <div class="section" id="s11">
+    <h2 class="section-title">11. Alur Siswa</h2>
+
+    <p>Berikut urutan lengkap penggunaan aplikasi dari sudut pandang siswa.</p>
+
+    <h3>Langkah 0 — Mendapatkan Kode Sekolah</h3>
+    <p>Sebelum mendaftar, siswa perlu meminta <strong>kode sekolah</strong> dari Guru BK. Kode ini berbentuk teks pendek (contoh: <code>RSB-01</code>) dan menghubungkan siswa ke akun Guru BK yang bersangkutan.</p>
+
+    <h3>Langkah 1 — Pendaftaran (<code>/daftar</code>)</h3>
+    <div class="card">
+      <p>Siswa mengisi tiga hal:</p>
+      <ul>
+        <li><strong>Nama panggilan</strong> — maksimal 20 karakter, bukan nama lengkap</li>
+        <li><strong>Kelas</strong> — X, XI, atau XII</li>
+        <li><strong>Kode sekolah</strong> — dari Guru BK</li>
+      </ul>
+      <p style="margin-top: 10px; margin-bottom: 0;"><em>Tidak ada kata sandi. Sesi terikat ke perangkat yang digunakan mendaftar via cookie terenkripsi.</em></p>
+    </div>
+
+    <h3>Langkah 2 — Persetujuan Data</h3>
+    <p>Sebelum mengakses fitur apapun, siswa membaca penjelasan tentang:</p>
+    <ul>
+      <li>Data apa yang dicatat</li>
+      <li>Siapa yang bisa melihat</li>
+      <li>Jaminan keamanan dan minimalis</li>
+      <li>Fungsi aplikasi sebagai pendamping belajar</li>
+    </ul>
+    <p>Siswa harus mencentang persetujuan dan klik <em>Mulai</em> untuk melanjutkan.</p>
+
+    <h3>Langkah 3 — Perencanaan</h3>
+
+    <h4>3a. Kenali Kebiasaan (<code>/siswa/kebiasaan</code>)</h4>
+    <div class="card">
+      <p>Siswa mencentang kebiasaan belajar yang sudah dilakukan (dari dua kelompok: membantu dan menghambat), lalu memilih <strong>satu kebiasaan</strong> yang ingin dicoba atau ditingkatkan minggu ini.</p>
+      <p style="margin-bottom:0;"><em>Contoh kebiasaan membantu: menulis jadwal belajar, belajar sedikit-sedikit setiap hari.</em><br/><em>Contoh kebiasaan menghambat: menunda sampai ujian dekat, belajar sambil membuka media sosial.</em></p>
+    </div>
+
+    <h4>3b. Tetapkan Tujuan (<code>/siswa/tujuan</code>)</h4>
+    <div class="card">
+      <p>Siswa menuliskan satu tujuan spesifik untuk satu minggu ke depan. Tujuan yang baik menjawab: <em>apa</em>, <em>kapan</em>, dan <em>berapa kali</em>.</p>
+      <p style="margin-bottom:0;"><em>Contoh kurang baik: "Aku mau lebih rajin belajar."</em><br/><em>Contoh baik: "Minggu ini aku menjawab 5 soal Matematika tanpa melihat catatan, Selasa dan Kamis pukul 19.00."</em></p>
+    </div>
+
+    <h4>3c. Atur Waktu — Jadwal Ulang Bertahap (<code>/siswa/waktu</code>)</h4>
+    <div class="card">
+      <p>Siswa memilih tanggal belajar pertama dan materi yang ingin dipelajari. Aplikasi otomatis membuat jadwal pengulangan bertahap:</p>
+      <table>
+        <tr><th>Sesi</th><th>Jeda dari Belajar Pertama</th><th>Aktivitas</th></tr>
+        <tr><td>Belajar awal</td><td>Hari 0</td><td>Pelajari materi baru</td></tr>
+        <tr><td>Ulang ke-1</td><td>Hari 1</td><td>Latihan mengingat kembali</td></tr>
+        <tr><td>Ulang ke-2</td><td>Hari 3</td><td>Latihan mengingat kembali</td></tr>
+        <tr><td>Ulang ke-3</td><td>Hari 7</td><td>Latihan mengingat kembali</td></tr>
+        <tr><td>Ulang ke-4</td><td>Hari 14</td><td>Latihan mengingat kembali</td></tr>
+      </table>
+      <p style="margin-bottom:0;">Jadwal bisa dicetak (<em>Print</em>) atau disalin ke buku catatan.</p>
+    </div>
+
+    <h3>Langkah 4 — Pelaksanaan</h3>
+
+    <h4>4a. Strategi &amp; Kuis (<code>/siswa/strategi</code>)</h4>
+    <div class="card">
+      <p>Siswa membaca penjelasan strategi belajar efektif, memilih strategi yang ingin dicoba minggu ini, lalu mengerjakan <strong>kuis mandiri 3 soal</strong>. Kuis tidak memiliki nilai — hanya untuk melatih ingatan. Jawaban boleh dicoba ulang sampai benar.</p>
+    </div>
+
+    <h4>4b. Fokus Belajar (<code>/siswa/fokus</code>)</h4>
+    <div class="card">
+      <p>Siswa membuat rencana konkret mengurangi gangguan:</p>
+      <ul>
+        <li>Apa yang dilakukan dengan notifikasi HP</li>
+        <li>Di mana tempat belajar</li>
+        <li>Alat apa yang perlu disiapkan sebelum mulai</li>
+      </ul>
+    </div>
+
+    <h3>Langkah 5 — Evaluasi</h3>
+
+    <h4>5a. Refleksi Mingguan (<code>/siswa/refleksi</code>)</h4>
+    <div class="card">
+      <p>Setelah satu minggu, siswa menjawab tiga pertanyaan:</p>
+      <ul>
+        <li>Apa yang berhasil?</li>
+        <li>Apa kendalanya?</li>
+        <li>Apa penyesuaian untuk minggu depan?</li>
+      </ul>
+      <p>Siswa juga memilih apakah hambatan belajarnya masih berlanjut dan apakah ingin berbicara dengan Guru BK.</p>
+      <p style="margin-bottom:0;"><em>Draf refleksi tersimpan otomatis di perangkat sehingga tidak hilang jika browser ditutup.</em></p>
+    </div>
+
+    <div class="card-warn">
+      <strong>Deteksi kata kritis:</strong> jika teks refleksi mengandung kata-kata bernada putus asa (seperti "ingin mati", "bunuh diri"), aplikasi menampilkan pesan dukungan dan mengarahkan siswa ke halaman Bantuan Guru BK.
+    </div>
+
+    <h4>5b. Bantuan Guru BK (<code>/siswa/bantuan</code>)</h4>
+    <div class="card">
+      <p>Siswa bisa:</p>
+      <ul>
+        <li>Memilih apakah ingin membagikan ringkasan ke Guru BK (ya/tidak)</li>
+        <li>Memilih apakah isi refleksi ikut dibagikan</li>
+        <li>Mengajukan jadwal konsultasi dari slot yang disediakan Guru BK</li>
+        <li>Melihat status permintaan konsultasi</li>
+        <li>Keluar dari perangkat ini</li>
+        <li><strong>Menghapus semua data</strong> — tidak bisa dibatalkan</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     BAB 12 — ALUR GURU BK
+══════════════════════════════════════════ -->
+<div class="page">
+  <div class="section" id="s12">
+    <h2 class="section-title">12. Alur Guru BK</h2>
+
+    <h3>Login (<code>/guru/masuk</code>)</h3>
+    <p>Guru BK login dengan email dan kata sandi yang dibuat oleh Admin. Jika lupa kata sandi, Admin perlu mereset dari Panel Admin atau langsung di Supabase Dashboard (Authentication &rarr; Users).</p>
+
+    <h3>Dashboard Guru BK (<code>/guru</code>)</h3>
+    <p>Dashboard memiliki empat tab:</p>
+
+    <h4>Tab Siswa</h4>
+    <div class="card">
+      <p>Daftar seluruh siswa yang terdaftar dengan kode sekolah milik Guru BK. Tersedia filter berdasarkan:</p>
+      <ul>
+        <li><strong>Kelas</strong> — X, XI, XII</li>
+        <li><strong>Status hambatan</strong> — dari pilihan refleksi siswa</li>
+      </ul>
+      <p>Untuk setiap siswa, terlihat:</p>
+      <ul>
+        <li>Status refleksi (sudah/belum)</li>
+        <li>Hambatan belajar (hanya jika siswa membagikan)</li>
+        <li>Skor kuis terakhir (hanya jika siswa membagikan)</li>
+        <li>Jumlah hari berlatih bulan ini (hanya jika siswa membagikan)</li>
+        <li>Isi refleksi (hanya jika siswa mengizinkan)</li>
+      </ul>
+      <p style="margin-bottom:0;"><em>Data yang tidak dibagikan siswa tidak terlihat — hanya muncul tanda "Tidak dibagikan".</em></p>
+    </div>
+
+    <div class="note">
+      Kolom <span class="chip red">Perlu perhatian</span> muncul jika refleksi siswa mengandung kata-kata yang membutuhkan respons segera. Guru BK disarankan menghubungi siswa secara langsung.
+    </div>
+
+    <h4>Tab Konsultasi</h4>
+    <div class="card">
+      <p>Daftar semua permintaan jadwal konsultasi dari siswa. Guru BK bisa mengubah status setiap permintaan:</p>
+      <ul>
+        <li><strong>Baru</strong> — permintaan baru masuk</li>
+        <li><strong>Dijadwalkan</strong> — sudah dikonfirmasi waktunya</li>
+        <li><strong>Selesai</strong> — konsultasi sudah berlangsung</li>
+      </ul>
+    </div>
+
+    <h4>Tab Kode Sekolah</h4>
+    <div class="card">
+      <p>Guru BK bisa:</p>
+      <ul>
+        <li>Melihat semua kode sekolah yang dimiliki</li>
+        <li>Menyalin kode untuk dibagikan ke siswa</li>
+        <li>Menonaktifkan kode yang sudah tidak dipakai (siswa baru tidak bisa mendaftar)</li>
+        <li>Membuat kode baru (contoh: untuk angkatan baru)</li>
+      </ul>
+      <p style="margin-bottom:0;"><em>Menonaktifkan kode tidak menghapus siswa yang sudah terdaftar.</em></p>
+    </div>
+
+    <h4>Tab Jadwal</h4>
+    <div class="card">
+      <p>Guru BK mengelola slot jadwal konsultasi yang tersedia untuk siswa. Slot yang aktif akan muncul di halaman Bantuan Guru BK di sisi siswa.</p>
+      <p>Contoh format jadwal: <em>"Jumat, 10.00 – 11.00"</em></p>
+      <p style="margin-bottom:0;">Slot bisa dinonaktifkan sementara tanpa dihapus.</p>
+    </div>
+
+    <h3>Tips untuk Guru BK</h3>
+    <ul>
+      <li>Bagikan kode sekolah di awal semester atau saat sesi bimbingan kelompok.</li>
+      <li>Minta siswa untuk mengisi refleksi mingguan setiap Jumat atau akhir minggu.</li>
+      <li>Pantau kolom "Perlu perhatian" setiap hari Senin sebagai rutinitas mingguan.</li>
+      <li>Jika kode sekolah lama sudah tidak aktif, buat kode baru untuk semester berikutnya agar data lama tetap tersimpan.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     BAB 13 — PANEL ADMIN
+══════════════════════════════════════════ -->
+<div class="page">
+  <div class="section" id="s13">
+    <h2 class="section-title">13. Panel Admin</h2>
+
+    <p>Panel Admin dapat diakses di <code>/admin</code> setelah login di <code>/admin/masuk</code>.</p>
+
+    <h3>Tab Overview</h3>
+    <div class="card">
+      <p>Ringkasan seluruh sistem: jumlah Guru BK, total siswa, siswa yang sudah consent, kode aktif, jumlah refleksi, dan permintaan konsultasi. Tersedia shortcut untuk masuk ke tampilan Guru BK atau Murid tertentu tanpa perlu login ulang.</p>
+    </div>
+
+    <h3>Tab Lihat View Guru &amp; Murid</h3>
+    <div class="card">
+      <p>Admin bisa mensimulasikan tampilan persis seperti yang dilihat Guru BK atau siswa tertentu. Banner ungu akan muncul di bagian atas halaman, menandakan mode preview. Admin bisa kembali ke Panel Admin kapan saja tanpa mengganggu sesi asli pengguna tersebut.</p>
+    </div>
+
+    <h3>Tab Guru BK</h3>
+    <div class="card">
+      <p>Daftar semua Guru BK beserta detail kode sekolah dan jadwal konsultasi miliknya. Admin bisa:</p>
+      <ul>
+        <li>Menambah Guru BK baru (nama, sekolah, email, kata sandi awal)</li>
+        <li>Menghapus Guru BK beserta semua datanya</li>
+        <li>Menambah/menonaktifkan kode sekolah untuk Guru BK tertentu</li>
+        <li>Menambah/menonaktifkan jadwal konsultasi</li>
+      </ul>
+    </div>
+
+    <h3>Tab Siswa</h3>
+    <div class="card">
+      <p>Daftar semua siswa dengan detail progres lengkap — terlepas dari pengaturan privasi siswa. Filter berdasarkan kelas dan kode sekolah. Admin bisa menghapus satu siswa atau semua siswa dari kode tertentu.</p>
+    </div>
+
+    <h3>Tab Konsultasi &amp; Refleksi</h3>
+    <div class="card">
+      <p>Melihat semua permintaan konsultasi dan refleksi terbaru dari seluruh sekolah. Admin bisa mengubah status permintaan konsultasi.</p>
+    </div>
+
+    <h3>Tab Edit Konten</h3>
+    <div class="card">
+      <p>Admin bisa mengubah teks yang tampil di halaman utama tanpa menyentuh kode:</p>
+      <ul>
+        <li>Judul dan subjudul halaman utama</li>
+        <li>Teks keempat badge di hero section</li>
+        <li>Intro halaman Strategi Belajar</li>
+        <li>Teks footer</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ══ BAB 14 ══ -->
+  <div class="section" id="s14">
+    <span class="section-eyebrow">Bagian IV — Referensi Teknis</span>
+    <h2 class="section-title">14. Skema Database</h2>
+
+    <h3>Relasi Antar Tabel</h3>
+    <div class="card-blue">
+      <code>auth.users</code> &rarr; <code>counselors</code> &rarr; <code>school_codes</code> &rarr; <code>students</code> &rarr; <code>student_plans</code>, <code>quiz_attempts</code>, <code>reflections</code>, <code>consult_requests</code>, <code>practice_days</code>
+    </div>
+
+    <h3>Detail Kolom Penting</h3>
+
+    <h4>students</h4>
+    <table>
+      <tr><th>Kolom</th><th>Tipe</th><th>Keterangan</th></tr>
+      <tr><td><code>id</code></td><td>uuid</td><td>Primary key, generated</td></tr>
+      <tr><td><code>token_hash</code></td><td>text</td><td>SHA-256 dari token sesi (unique)</td></tr>
+      <tr><td><code>nickname</code></td><td>text</td><td>1–20 karakter</td></tr>
+      <tr><td><code>class</code></td><td>text</td><td>X / XI / XII</td></tr>
+      <tr><td><code>school_code</code></td><td>text</td><td>FK ke school_codes</td></tr>
+      <tr><td><code>consent_at</code></td><td>timestamptz</td><td>null = belum consent</td></tr>
+      <tr><td><code>share_summary</code></td><td>boolean</td><td>Izin berbagi ke guru</td></tr>
+      <tr><td><code>include_reflection</code></td><td>boolean</td><td>Izin berbagi isi refleksi</td></tr>
+    </table>
+
+    <h4>reflections</h4>
+    <table>
+      <tr><th>Kolom</th><th>Tipe</th><th>Keterangan</th></tr>
+      <tr><td><code>r1</code></td><td>text</td><td>Yang berhasil</td></tr>
+      <tr><td><code>r2</code></td><td>text</td><td>Kendala</td></tr>
+      <tr><td><code>r3</code></td><td>text</td><td>Penyesuaian minggu depan</td></tr>
+      <tr><td><code>barrier</code></td><td>text</td><td>tidak / sedikit / ya</td></tr>
+      <tr><td><code>support_flag</code></td><td>boolean</td><td>true jika ada kata kritis terdeteksi</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     BAB 15–17
+══════════════════════════════════════════ -->
+<div class="page">
+  <div class="section" id="s15">
+    <h2 class="section-title">15. Struktur Folder</h2>
+
+    <pre><code>src/
+├── app/
+│   ├── page.tsx              # Halaman utama (pilih cara masuk)
+│   ├── layout.tsx            # Root layout
+│   ├── actions.ts            # Server Actions untuk siswa
+│   ├── guru-actions.ts       # Server Actions untuk guru
+│   ├── admin-actions.ts      # Server Actions untuk admin
+│   ├── daftar/page.tsx       # Pendaftaran siswa
+│   ├── siswa/
+│   │   ├── layout.tsx        # Layout + topbar siswa
+│   │   ├── page.tsx          # Dashboard siswa
+│   │   ├── kebiasaan/        # Kenali Kebiasaan
+│   │   ├── tujuan/           # Tetapkan Tujuan
+│   │   ├── waktu/            # Atur Waktu
+│   │   ├── strategi/         # Strategi + Kuis
+│   │   ├── fokus/            # Fokus Belajar
+│   │   ├── refleksi/         # Refleksi Mingguan
+│   │   └── bantuan/          # Bantuan Guru BK
+│   ├── guru/
+│   │   ├── masuk/page.tsx    # Login guru
+│   │   └── page.tsx          # Dashboard guru
+│   └── admin/
+│       ├── masuk/page.tsx    # Login admin
+│       └── page.tsx          # Panel admin
+├── components/
+│   ├── Nav.tsx               # Bottom nav + subtabs
+│   ├── Calendar.tsx          # Kalender hari berlatih
+│   ├── Quiz.tsx              # Kuis mandiri (client)
+│   ├── DraftTextarea.tsx     # Textarea dengan draf otomatis
+│   ├── Flash.tsx             # Pesan sukses/error
+│   ├── Submit.tsx            # Tombol submit dengan loading
+│   ├── PrintButton.tsx       # Tombol cetak jadwal
+│   ├── CopyButton.tsx        # Tombol salin kode
+│   ├── GuruLoginForm.tsx     # Form login guru
+│   ├── AddCounselorForm.tsx  # Form tambah guru (admin)
+│   └── AdminActions.tsx      # Form hapus (admin)
+└── lib/
+    ├── constants.ts          # Konstanta: habits, strategies, quiz, dsb.
+    ├── data.ts               # Query data siswa
+    ├── session.ts            # Manajemen sesi
+    ├── supabase-admin.ts     # Client Supabase (service role)
+    ├── supabase-server.ts    # Client Supabase (anon, untuk auth)
+    └── util.ts               # Fungsi utilitas
+
+supabase/
+└── schema.sql                # Skema + seed database</code></pre>
+  </div>
+
+  <div class="section" id="s16">
+    <h2 class="section-title">16. Keamanan &amp; Privasi</h2>
+
+    <h3>Row Level Security (RLS)</h3>
+    <p>Semua tabel mengaktifkan RLS tanpa policy publik. Artinya tidak ada akses langsung dari browser ke database — seluruh akses data melewati server Next.js menggunakan service role key.</p>
+
+    <h3>Sesi Siswa</h3>
+    <ul>
+      <li>Token dibuat dengan <code>crypto.randomBytes(32)</code></li>
+      <li>Hanya hash SHA-256 yang disimpan di database</li>
+      <li>Token asli ada di cookie <code>httpOnly; SameSite=Strict</code></li>
+      <li>Tidak ada kata sandi yang perlu diingat atau bisa dicuri</li>
+    </ul>
+
+    <h3>Isolasi Data Guru BK</h3>
+    <p>Guru BK hanya bisa melihat siswa yang terdaftar dengan kode sekolah miliknya. Query selalu difilter berdasarkan <code>owner_id</code> yang dicocokkan dengan sesi guru yang login.</p>
+
+    <h3>Kontrol Privasi Siswa</h3>
+    <ul>
+      <li>Guru BK hanya melihat data yang siswa aktifkan via toggle <em>Bagikan ringkasan</em></li>
+      <li>Isi refleksi hanya terlihat jika siswa mengaktifkan <em>Sertakan refleksi</em></li>
+      <li>Siswa bisa mencabut izin berbagi atau menghapus semua datanya kapan saja</li>
+    </ul>
+
+    <h3>Variabel Environment</h3>
+    <div class="card-warn">
+      <code>SUPABASE_SERVICE_ROLE_KEY</code> tidak boleh memiliki awalan <code>NEXT_PUBLIC_</code>. Jika salah diberi awalan tersebut, kunci ini akan terekspos di JavaScript bundle yang dikirim ke browser.
+    </div>
+  </div>
+
+  <div class="section" id="s17">
+    <h2 class="section-title">17. Keterbatasan &amp; Catatan</h2>
+
+    <h3>Sesi Siswa Tanpa Kata Sandi</h3>
+    <div class="card-warn">
+      Data siswa terikat ke perangkat dan browser yang digunakan mendaftar. Jika ganti perangkat, hapus cookie, atau ganti browser, siswa perlu mendaftar ulang dan data lama tidak bisa diakses lagi. Solusi lanjutan: sistem kode pemulihan.
+    </div>
+
+    <h3>Deteksi Kata Kritis</h3>
+    <p>Deteksi kata bernada putus asa menggunakan regex sederhana yang ditetapkan di <code>src/lib/constants.ts</code>:</p>
+    <pre><code>export const CRISIS =
+  /bunuh diri|mengakhiri hidup|ingin mati|pengen mati|
+   menyakiti diri|melukai diri|putus asa/i;</code></pre>
+    <p>Daftar kata ini sebaiknya ditinjau dan disepakati bersama Guru BK sekolah. Aplikasi <strong>bukan</strong> layanan krisis dan tidak membalas pesan.</p>
+
+    <h3>Tidak Ada Pembatasan Percobaan Login</h3>
+    <p>Belum ada rate limiting khusus untuk login Guru BK di luar bawaan Supabase. Untuk produksi, pertimbangkan menambahkan Cloudflare Turnstile atau mekanisme serupa.</p>
+
+    <h3>Retensi Data</h3>
+    <p>Belum ada kebijakan penghapusan data otomatis berkala. Untuk kepatuhan privasi, pertimbangkan menetapkan batas retensi data (misal: hapus akun siswa yang tidak aktif lebih dari 1 tahun).</p>
+
+    <h3>Persetujuan Institusional</h3>
+    <div class="note">
+      Untuk penggunaan di sekolah nyata, persetujuan dari pihak sekolah serta orang tua/wali siswa tetap diperlukan, terlepas dari mekanisme persetujuan digital yang ada di aplikasi.
+    </div>
+
+    <h3>Belum Diuji di Produksi</h3>
+    <p>Aplikasi ini telah lolos typecheck dan build lokal, namun belum diuji secara menyeluruh dengan database Supabase sungguhan di lingkungan produksi. Lakukan pengujian menyeluruh sebelum digunakan di sekolah.</p>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ══ PENUTUP ══ -->
+  <div style="text-align: center; padding: 40px 0; color: #aaa; font-size: 10pt;">
+    <p style="margin-bottom: 6px;"><strong style="color: #e8524a;">Ruang Strategi Belajar</strong></p>
+    <p>Dokumentasi ini dibuat berdasarkan source code versi 0.1.0</p>
+    <p>Next.js 15 &middot; Supabase &middot; TypeScript</p>
+  </div>
+</div>
+
+</body>
+</html>

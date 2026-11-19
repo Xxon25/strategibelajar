@@ -28,7 +28,7 @@ export default async function Tujuan({ searchParams }: { searchParams: Promise<{
       {/* Contoh card */}
       <div className="card">
         <div style={{ display: 'flex', gap: 12 }}>
-          <span style={{ fontSize: 22, flexShrink: 0 }}>💡</span>          <div style={{ display: 'grid', gap: 10 }}>
+          <span style={{ fontSize: 22, flexShrink: 0 }} />          <div style={{ display: 'grid', gap: 10 }}>
             <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
               <span className="chip warn" style={{ flexShrink: 0 }}>Kurang jelas</span>
               <span style={{ fontSize: 14, color: 'var(--muted)' }}>&ldquo;Aku mau lebih rajin belajar.&rdquo;</span>

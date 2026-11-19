@@ -126,7 +126,7 @@ export default async function Masuk({ searchParams }: { searchParams: Promise<{ 
             {s ? (
               <Link className="item" href="/siswa">
                 <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#e8524a,#c73b35)', display: 'grid', placeItems: 'center', fontSize: '22px' }}>📚</span>
+                  <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#e8524a,#c73b35)', display: 'grid', placeItems: 'center' }} />
                   <span>
                     <span className="t">Lanjutkan sebagai {s.nickname}</span>
                     <span className="d">Kelas {s.class} · perangkat ini</span>
@@ -137,7 +137,7 @@ export default async function Masuk({ searchParams }: { searchParams: Promise<{ 
             ) : (
               <Link className="item" href="/daftar">
                 <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#e8524a,#c73b35)', display: 'grid', placeItems: 'center', fontSize: '22px' }}>📚</span>
+                  <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#e8524a,#c73b35)', display: 'grid', placeItems: 'center' }} />
                   <span>
                     <span className="t">Masuk sebagai Siswa</span>
                     <span className="d">Daftar dengan nama panggilan &amp; kode sekolah</span>
@@ -149,7 +149,7 @@ export default async function Masuk({ searchParams }: { searchParams: Promise<{ 
 
             <Link className="item" href="/guru/masuk">
               <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#0e9f8a,#0a7a68)', display: 'grid', placeItems: 'center', fontSize: '22px' }}>🏫</span>
+                <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#0e9f8a,#0a7a68)', display: 'grid', placeItems: 'center' }} />
                 <span>
                   <span className="t">Masuk sebagai Guru BK</span>
                   <span className="d">Khusus guru BK · email &amp; kata sandi</span>

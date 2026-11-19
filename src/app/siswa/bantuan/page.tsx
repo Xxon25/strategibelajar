@@ -17,7 +17,7 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
   return (
     <>
       <div style={{ background: 'var(--grad)', borderRadius: 'var(--r-lg)', padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.6)' }}>💬 Bantuan Guru BK</span>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,.6)' }}>Bantuan Guru BK</span>
         <h2 style={{ color: '#fff', margin: 0, fontSize: 24 }}>Ceritamu rahasia.</h2>
         <p style={{ color: 'rgba(255,255,255,.75)', margin: 0, fontSize: 15, lineHeight: 1.6, maxWidth: 480 }}>
           Kamu yang memilih apa yang dibagikan. Meminta bantuan itu langkah yang berani.
@@ -34,7 +34,7 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
         <div style={{ display: 'grid', gap: 16 }}>
           {/* Bagikan ringkasan */}
           <form action={saveShare} className="card">
-            <h3>🔗 Bagikan ringkasan ke guru BK?</h3>
+            <h3>Bagikan ringkasan ke guru BK?</h3>
             <fieldset style={{ gap: 8 }}>
               <label className="choice">
                 <input type="radio" name="share" value="1" defaultChecked={s.share_summary} />
@@ -57,13 +57,12 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
               {s.share_summary ? (
                 <div style={{ display: 'grid', gap: 6 }}>
                   {[
-                    ['🧱', 'Hambatan', last ? BARRIER[last.barrier].short : 'Belum diisi'],
-                    ['🧠', 'Kuis', d.quiz ? `Benar ${d.quiz.score} dari ${d.quiz.total}` : 'Belum dikerjakan'],
-                    ['📅', 'Hari berlatih bulan ini', `${n} hari`],
-                    ['📝', 'Refleksi', s.include_reflection ? 'Ikut dibagikan' : 'Tidak dibagikan'],
-                  ].map(([icon, label, val]) => (
+                    ['Hambatan', last ? BARRIER[last.barrier].short : 'Belum diisi'],
+                    ['Kuis', d.quiz ? `Benar ${d.quiz.score} dari ${d.quiz.total}` : 'Belum dikerjakan'],
+                    ['Hari berlatih bulan ini', `${n} hari`],
+                    ['Refleksi', s.include_reflection ? 'Ikut dibagikan' : 'Tidak dibagikan'],
+                  ].map(([label, val]) => (
                     <div key={String(label)} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13 }}>
-                      <span>{icon}</span>
                       <span style={{ color: 'var(--muted)' }}>{label}:</span>
                       <span style={{ fontWeight: 600, color: 'var(--ink2)' }}>{val}</span>
                     </div>
@@ -82,7 +81,7 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
         <div style={{ display: 'grid', gap: 16 }}>
           {/* Konsultasi */}
           <form action={requestConsult} className="card">
-            <h3>📅 Pilih jadwal konsultasi</h3>
+            <h3>Pilih jadwal konsultasi</h3>
             {slots.length === 0 ? (
               <div style={{ padding: '16px', background: 'var(--surface2)', borderRadius: 'var(--r)', textAlign: 'center' }}>
                 <p style={{ fontSize: 14, color: 'var(--muted)', margin: 0 }}>
@@ -121,7 +120,7 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
 
           {/* Kapan minta bantuan */}
           <div className="card">
-            <h3>🤔 Kapan sebaiknya meminta bantuan?</h3>
+            <h3>Kapan sebaiknya meminta bantuan?</h3>
             <div style={{ display: 'grid', gap: 8 }}>
               {[
                 'Sudah mencoba strategi beberapa minggu tapi kesulitan belum berkurang.',
@@ -147,7 +146,7 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
 
       {/* Pengaturan data */}
       <details className="card">
-        <summary>⚙️ Pengaturan data</summary>
+        <summary>Pengaturan data</summary>
         <style>{`@media(min-width:600px){.data-settings{display:grid!important;grid-template-columns:1fr 1fr;gap:16px}}`}</style>
         <div className="data-settings" style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
           <div style={{ padding: '16px', background: 'var(--surface2)', borderRadius: 'var(--r)', display: 'grid', gap: 10 }}>
@@ -166,7 +165,7 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
       </details>
 
       <p className="small" style={{ textAlign: 'center' }}>
-        🔒 Yang bisa melihat datamu: kamu, dan guru BK untuk bagian yang kamu izinkan saja.
+        Yang bisa melihat datamu: kamu, dan guru BK untuk bagian yang kamu izinkan saja.
       </p>
     </>
   );
