@@ -4,7 +4,7 @@ import { requireGuru } from '@/lib/session';
 import { admin } from '@/lib/supabase-admin';
 import { BARRIER, CLASSES, STATUSES, QUIZ } from '@/lib/constants';
 import { todayJakarta } from '@/lib/util';
-import { logoutGuru, setRequestStatus, newCode, toggleCode, addSlot, toggleSlot } from '@/app/guru-actions';
+import { logoutGuru, setRequestStatus, newCode, toggleCode, addSlot, toggleSlot, replyRequest } from '@/app/guru-actions';
 import { exitPreview } from '@/app/admin-actions';
 import Submit from '@/components/Submit';
 import CopyButton from '@/components/CopyButton';
@@ -23,7 +23,7 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
   let reflData: Refl[] = [];
   let quizData: Array<{ student_id: string; score: number; total: number }> = [];
   let daysData: Array<{ student_id: string }> = [];
-  let requests: Array<{ id: string; student_id: string; slot_label: string; status: string; mode: string }> = [];
+  let requests: Array<{ id: string; student_id: string; slot_label: string; status: string; mode: string; room_info: string; reschedule_note: string; meet_link: string; confirmed_time: string }> = [];
   let slotsData: Array<{ id: string; label: string; active: boolean; mode: string }> = [];
 
   try {
@@ -41,7 +41,7 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
       ids.length ? sb.from('reflections').select('student_id,r1,r2,r3,barrier,support_flag,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
       ids.length ? sb.from('quiz_attempts').select('student_id,score,total,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
       ids.length ? sb.from('practice_days').select('student_id,day').in('student_id', ids).gte('day', monthStart) : { data: [] },
-      ids.length ? sb.from('consult_requests').select('id,student_id,slot_label,status,mode,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
+      ids.length ? sb.from('consult_requests').select('id,student_id,slot_label,status,mode,room_info,reschedule_note,meet_link,confirmed_time,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
       sb.from('consult_slots').select('id,label,active,mode').eq('owner_id', g.user_id).order('created_at'),
     ]);
     reflData = (reflRes.data ?? []) as Refl[];
@@ -319,14 +319,22 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
                 <p style={{ fontSize: 15, fontWeight: 600 }}>Belum ada permintaan konsultasi.</p>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
                 {requests.map((r) => {
                   const s = byId.get(r.student_id);
+                  const isOnline = r.mode === 'online';
+                  const hasReply = isOnline
+                    ? !!(r.confirmed_time || r.meet_link)
+                    : !!(r.room_info || r.reschedule_note);
                   return (
-                    <div key={r.id} className="card" style={{ borderTop: `3px solid ${r.status === 'Baru' ? 'var(--accent)' : r.status === 'Selesai' ? 'var(--sec)' : 'var(--warn-ink)'}` }}>
+                    <div key={r.id} className="card" style={{
+                      borderTop: `3px solid ${r.status === 'Baru' ? 'var(--accent)' : r.status === 'Selesai' ? 'var(--sec)' : '#7c5cbf'}`,
+                      gap: 14,
+                    }}>
+                      {/* Header siswa + status */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--tint2)', display: 'grid', placeItems: 'center', fontSize: 16, fontWeight: 800, color: 'var(--accent)' }}>
+                          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--tint2)', display: 'grid', placeItems: 'center', fontSize: 16, fontWeight: 800, color: 'var(--accent)', flexShrink: 0 }}>
                             {(s?.nickname ?? 'S')[0].toUpperCase()}
                           </div>
                           <div>
@@ -336,19 +344,117 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
                         </div>
                         <span className={'chip' + (r.status === 'Baru' ? ' warn' : r.status === 'Selesai' ? ' ok' : '')}>{r.status}</span>
                       </div>
-                      <div style={{ background: 'var(--surface2)', borderRadius: 'var(--r)', padding: '10px 14px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+
+                      {/* Info jadwal */}
+                      <div style={{
+                        background: isOnline ? '#e8f7f5' : '#fff0ef',
+                        border: `1px solid ${isOnline ? '#c0eae5' : '#fad9d7'}`,
+                        borderRadius: 10, padding: '10px 14px', fontSize: 13,
+                        display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+                      }}>
                         <span style={{
                           fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
-                          background: r.mode === 'online' ? '#e8f7f5' : '#fff0ef',
-                          color: r.mode === 'online' ? '#2a9d8f' : '#e8524a',
-                          border: `1px solid ${r.mode === 'online' ? '#c0eae5' : '#fad9d7'}`,
-                          whiteSpace: 'nowrap',
+                          background: isOnline ? '#2a9d8f' : '#e8524a', color: '#fff',
                         }}>
-                          {r.mode === 'online' ? 'Online' : 'Tatap Muka'}
+                          {isOnline ? 'Online' : 'Tatap Muka'}
                         </span>
-                        <span style={{ color: 'var(--muted)' }}>Jadwal dipilih: </span>
+                        <span style={{ color: 'var(--muted)' }}>Jadwal dipilih:</span>
                         <span style={{ fontWeight: 700 }}>{r.slot_label}</span>
                       </div>
+
+                      {/* Balasan yang sudah ada */}
+                      {hasReply && (
+                        <div style={{
+                          background: 'var(--surface2)', border: '1px solid var(--line)',
+                          borderRadius: 10, padding: '12px 14px', fontSize: 13, display: 'grid', gap: 6,
+                        }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--muted)' }}>
+                            Balasan tersimpan
+                          </span>
+                          {isOnline ? (
+                            <>
+                              {r.confirmed_time && (
+                                <div><span style={{ color: 'var(--muted)' }}>Jam pasti:</span> <strong>{r.confirmed_time}</strong></div>
+                              )}
+                              {r.meet_link && (
+                                <div style={{ wordBreak: 'break-all' }}>
+                                  <span style={{ color: 'var(--muted)' }}>Link:</span>{' '}
+                                  <a href={r.meet_link} target="_blank" rel="noopener noreferrer" style={{ color: '#2a9d8f', fontWeight: 600 }}>{r.meet_link}</a>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              {r.room_info && (
+                                <div><span style={{ color: 'var(--muted)' }}>Ruangan:</span> <strong>{r.room_info}</strong></div>
+                              )}
+                              {r.reschedule_note && (
+                                <div><span style={{ color: 'var(--muted)' }}>Catatan:</span> {r.reschedule_note}</div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Form balas — inline, berbeda untuk online vs offline */}
+                      {r.status !== 'Selesai' && (
+                        <details style={{ fontSize: 13 }}>
+                          <summary style={{ cursor: 'pointer', fontWeight: 700, color: 'var(--accent)', userSelect: 'none', padding: '4px 0' }}>
+                            {hasReply ? 'Edit balasan' : isOnline ? 'Konfirmasi jam & link meeting' : 'Isi ruangan / geser jadwal'}
+                          </summary>
+                          <form action={replyRequest} style={{ display: 'grid', gap: 10, marginTop: 10 }}>
+                            <input type="hidden" name="id" value={r.id} />
+                            <input type="hidden" name="mode" value={r.mode} />
+                            {isOnline ? (
+                              <>
+                                <div>
+                                  <label className="q" style={{ fontSize: 12 }}>Jam pasti</label>
+                                  <input
+                                    type="text" name="confirmed_time" maxLength={80}
+                                    defaultValue={r.confirmed_time}
+                                    placeholder="Contoh: Jumat, 10 Jan — 10.00 WIB"
+                                    style={{ fontSize: 13 }}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="q" style={{ fontSize: 12 }}>Link Zoom / Google Meet</label>
+                                  <input
+                                    type="url" name="meet_link" maxLength={500}
+                                    defaultValue={r.meet_link}
+                                    placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                                    style={{ fontSize: 13 }}
+                                  />
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div>
+                                  <label className="q" style={{ fontSize: 12 }}>Ruangan</label>
+                                  <input
+                                    type="text" name="room_info" maxLength={120}
+                                    defaultValue={r.room_info}
+                                    placeholder="Contoh: Ruang BK Lt. 2 / Ruang 205"
+                                    style={{ fontSize: 13 }}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="q" style={{ fontSize: 12 }}>Catatan (opsional — geser jadwal, dll)</label>
+                                  <textarea
+                                    name="reschedule_note" maxLength={300}
+                                    defaultValue={r.reschedule_note}
+                                    placeholder="Contoh: Jadwal digeser ke Senin 13 Jan pukul 10.00 karena rapat."
+                                    rows={2}
+                                    style={{ fontSize: 13, resize: 'vertical', width: '100%', padding: '8px 12px', borderRadius: 8, border: '1.5px solid var(--line)', fontFamily: 'inherit' }}
+                                  />
+                                </div>
+                              </>
+                            )}
+                            <Submit pendingText="Menyimpan…">Simpan &amp; tandai Dijadwalkan</Submit>
+                          </form>
+                        </details>
+                      )}
+
+                      {/* Ubah status */}
                       <div className="seg3">
                         {STATUSES.map((st) => (
                           <form key={st} action={setRequestStatus}>

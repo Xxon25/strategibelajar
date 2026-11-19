@@ -76,6 +76,32 @@ export async function setRequestStatus(f: FormData) {
   }
 }
 
+export async function replyRequest(f: FormData) {
+  const g = await requireGuru();
+  const id = txt(f, 'id', 60);
+  const mode = txt(f, 'mode', 10);
+  try {
+    const sb = admin();
+    const { data: r } = await sb.from('consult_requests').select('student_id').eq('id', id).maybeSingle();
+    if (!r || !(await ownsStudent(g.user_id, r.student_id))) return;
+    const patch: Record<string, string> = {};
+    if (mode === 'offline') {
+      patch.room_info       = txt(f, 'room_info', 120);
+      patch.reschedule_note = txt(f, 'reschedule_note', 300);
+      patch.status          = 'Dijadwalkan';
+    } else {
+      patch.confirmed_time = txt(f, 'confirmed_time', 80);
+      patch.meet_link      = txt(f, 'meet_link', 500);
+      patch.status         = 'Dijadwalkan';
+    }
+    await sb.from('consult_requests').update(patch).eq('id', id);
+    revalidatePath('/guru');
+    revalidatePath('/siswa/bantuan');
+  } catch (err) {
+    console.error('[replyRequest] Error:', err);
+  }
+}
+
 export async function newCode(f: FormData) {
   const g = await requireGuru();
   const note = txt(f, 'note', 80) || 'Dibuat hari ini';

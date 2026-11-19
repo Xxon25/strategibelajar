@@ -84,14 +84,14 @@ export const studentData = cache(async (id: string) => {
       sb.from('student_plans').select('*').eq('student_id', id).maybeSingle(),
       sb.from('quiz_attempts').select('score,total').eq('student_id', id).order('created_at', { ascending: false }).limit(1),
       sb.from('reflections').select('id,r1,r2,r3,barrier,support_flag,created_at').eq('student_id', id).order('created_at', { ascending: false }).limit(5),
-      sb.from('consult_requests').select('id,slot_label,status,created_at').eq('student_id', id).order('created_at', { ascending: false }),
+      sb.from('consult_requests').select('id,slot_label,status,mode,room_info,reschedule_note,meet_link,confirmed_time,created_at').eq('student_id', id).order('created_at', { ascending: false }),
       sb.from('practice_days').select('day').eq('student_id', id).gte('day', monthStart),
     ]);
     return {
       plan: { ...EMPTY_PLAN, ...(plan.data ?? {}) } as Plan,
       quiz: (quiz.data?.[0] ?? null) as { score: number; total: number } | null,
       reflections: (refl.data ?? []) as Array<{ id: string; r1: string; r2: string; r3: string; barrier: 'tidak' | 'sedikit' | 'ya'; support_flag: boolean; created_at: string }>,
-      requests: (req.data ?? []) as Array<{ id: string; slot_label: string; status: string; created_at: string }>,
+      requests: (req.data ?? []) as Array<{ id: string; slot_label: string; status: string; mode: string; room_info: string; reschedule_note: string; meet_link: string; confirmed_time: string; created_at: string }>,
       days: (days.data ?? []).map((d) => d.day as string),
     };
   } catch (err) {

@@ -158,28 +158,88 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
               <div style={{ display: 'grid', gap: 8, marginTop: 4 }}>
                 <span className="small" style={{ fontWeight: 700 }}>Permintaan sebelumnya:</span>
                 {d.requests.map((r) => {
-                  const req = r as typeof r & { mode?: string };
-                  const isOnline = req.mode === 'online';
+                  const isOnline = r.mode === 'online';
+                  const hasReply = isOnline
+                    ? !!(r.confirmed_time || r.meet_link)
+                    : !!(r.room_info || r.reschedule_note);
                   return (
                     <div key={r.id} style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '10px 14px', background: 'var(--surface2)',
+                      background: 'var(--surface2)',
                       borderRadius: 'var(--r)', border: '1px solid var(--line)',
-                      gap: 8, flexWrap: 'wrap',
+                      overflow: 'hidden',
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{
-                          fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
-                          background: isOnline ? '#e8f7f5' : '#fff0ef',
-                          color: isOnline ? '#2a9d8f' : '#e8524a',
-                          border: `1px solid ${isOnline ? '#c0eae5' : '#fad9d7'}`,
-                          whiteSpace: 'nowrap',
-                        }}>
-                          {isOnline ? 'Online' : 'Tatap Muka'}
-                        </span>
-                        <span style={{ fontWeight: 600, fontSize: 14 }}>{r.slot_label}</span>
+                      {/* Baris utama */}
+                      <div style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        padding: '10px 14px', gap: 8, flexWrap: 'wrap',
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{
+                            fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
+                            background: isOnline ? '#e8f7f5' : '#fff0ef',
+                            color: isOnline ? '#2a9d8f' : '#e8524a',
+                            border: `1px solid ${isOnline ? '#c0eae5' : '#fad9d7'}`,
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {isOnline ? 'Online' : 'Tatap Muka'}
+                          </span>
+                          <span style={{ fontWeight: 600, fontSize: 14 }}>{r.slot_label}</span>
+                        </div>
+                        <span className={'chip' + (r.status === 'Baru' ? ' warn' : r.status === 'Selesai' ? ' ok' : '')}>{r.status}</span>
                       </div>
-                      <span className={'chip' + (r.status === 'Baru' ? ' warn' : r.status === 'Selesai' ? ' ok' : '')}>{r.status}</span>
+
+                      {/* Balasan guru BK */}
+                      {hasReply && (
+                        <div style={{
+                          borderTop: `1px solid ${isOnline ? '#c0eae5' : '#fad9d7'}`,
+                          background: isOnline ? '#f0faf8' : '#fff8f7',
+                          padding: '10px 14px', fontSize: 13, display: 'grid', gap: 6,
+                        }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: isOnline ? '#2a9d8f' : '#e8524a' }}>
+                            Info dari Guru BK
+                          </span>
+                          {isOnline ? (
+                            <>
+                              {r.confirmed_time && (
+                                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                  <span style={{ color: 'var(--muted)' }}>Waktu:</span>
+                                  <strong>{r.confirmed_time}</strong>
+                                </div>
+                              )}
+                              {r.meet_link && (
+                                <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                                  <span style={{ color: 'var(--muted)', flexShrink: 0 }}>Link meeting:</span>
+                                  <a
+                                    href={r.meet_link} target="_blank" rel="noopener noreferrer"
+                                    style={{
+                                      color: '#2a9d8f', fontWeight: 700, wordBreak: 'break-all',
+                                      background: '#fff', padding: '3px 10px', borderRadius: 6,
+                                      border: '1px solid #c0eae5', textDecoration: 'none', fontSize: 13,
+                                    }}
+                                  >
+                                    Buka link meeting →
+                                  </a>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              {r.room_info && (
+                                <div style={{ display: 'flex', gap: 6 }}>
+                                  <span style={{ color: 'var(--muted)', flexShrink: 0 }}>Ruangan:</span>
+                                  <strong>{r.room_info}</strong>
+                                </div>
+                              )}
+                              {r.reschedule_note && (
+                                <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                                  <span style={{ color: 'var(--muted)', flexShrink: 0 }}>Catatan:</span>
+                                  <span>{r.reschedule_note}</span>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
