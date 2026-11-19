@@ -14,6 +14,9 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
   const last = d.reflections[0];
   const n = monthInfo(d.days).n;
 
+  const onlineSlots = slots.filter((sl) => sl.mode === 'online');
+  const offlineSlots = slots.filter((sl) => sl.mode === 'offline');
+
   return (
     <>
       <div style={{ background: 'var(--grad)', borderRadius: 'var(--r-lg)', padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -82,6 +85,7 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
           {/* Konsultasi */}
           <form action={requestConsult} className="card">
             <h3>Pilih jadwal konsultasi</h3>
+
             {slots.length === 0 ? (
               <div style={{ padding: '16px', background: 'var(--surface2)', borderRadius: 'var(--r)', textAlign: 'center' }}>
                 <p style={{ fontSize: 14, color: 'var(--muted)', margin: 0 }}>
@@ -90,30 +94,95 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
               </div>
             ) : (
               <>
-                <fieldset style={{ gap: 8 }}>
-                  {slots.map((sl) => (
-                    <label key={sl.id} className="choice">
-                      <input type="radio" name="slot" value={sl.id} />
-                      <span>{sl.label}</span>
-                    </label>
-                  ))}
-                </fieldset>
+                {/* Online slots */}
+                {onlineSlots.length > 0 && (
+                  <div style={{ display: 'grid', gap: 8 }}>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '7px 12px', borderRadius: 8,
+                      background: '#e8f7f5', border: '1px solid #c0eae5',
+                    }}>
+                      <span style={{
+                        width: 8, height: 8, borderRadius: '50%',
+                        background: '#2a9d8f', flexShrink: 0,
+                      }} />
+                      <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: '#2a9d8f' }}>
+                        Online
+                      </span>
+                      <span style={{ fontSize: 11, color: '#2a9d8f', opacity: .75 }}>— via video call / chat</span>
+                    </div>
+                    <fieldset style={{ gap: 6 }}>
+                      {onlineSlots.map((sl) => (
+                        <label key={sl.id} className="choice">
+                          <input type="radio" name="slot" value={sl.id} />
+                          <span>{sl.label}</span>
+                        </label>
+                      ))}
+                    </fieldset>
+                  </div>
+                )}
+
+                {/* Offline slots */}
+                {offlineSlots.length > 0 && (
+                  <div style={{ display: 'grid', gap: 8, marginTop: onlineSlots.length > 0 ? 12 : 0 }}>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '7px 12px', borderRadius: 8,
+                      background: '#fff0ef', border: '1px solid #fad9d7',
+                    }}>
+                      <span style={{
+                        width: 8, height: 8, borderRadius: '50%',
+                        background: '#e8524a', flexShrink: 0,
+                      }} />
+                      <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: '#e8524a' }}>
+                        Tatap Muka
+                      </span>
+                      <span style={{ fontSize: 11, color: '#e8524a', opacity: .75 }}>— di sekolah</span>
+                    </div>
+                    <fieldset style={{ gap: 6 }}>
+                      {offlineSlots.map((sl) => (
+                        <label key={sl.id} className="choice">
+                          <input type="radio" name="slot" value={sl.id} />
+                          <span>{sl.label}</span>
+                        </label>
+                      ))}
+                    </fieldset>
+                  </div>
+                )}
+
                 <Submit>Ajukan jadwal</Submit>
               </>
             )}
+
             {d.requests.length > 0 && (
               <div style={{ display: 'grid', gap: 8, marginTop: 4 }}>
                 <span className="small" style={{ fontWeight: 700 }}>Permintaan sebelumnya:</span>
-                {d.requests.map((r) => (
-                  <div key={r.id} style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '10px 14px', background: 'var(--surface2)',
-                    borderRadius: 'var(--r)', border: '1px solid var(--line)',
-                  }}>
-                    <span style={{ fontWeight: 600, fontSize: 14 }}>{r.slot_label}</span>
-                    <span className={'chip' + (r.status === 'Baru' ? ' warn' : r.status === 'Selesai' ? ' ok' : '')}>{r.status}</span>
-                  </div>
-                ))}
+                {d.requests.map((r) => {
+                  const req = r as typeof r & { mode?: string };
+                  const isOnline = req.mode === 'online';
+                  return (
+                    <div key={r.id} style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      padding: '10px 14px', background: 'var(--surface2)',
+                      borderRadius: 'var(--r)', border: '1px solid var(--line)',
+                      gap: 8, flexWrap: 'wrap',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
+                          background: isOnline ? '#e8f7f5' : '#fff0ef',
+                          color: isOnline ? '#2a9d8f' : '#e8524a',
+                          border: `1px solid ${isOnline ? '#c0eae5' : '#fad9d7'}`,
+                          whiteSpace: 'nowrap',
+                        }}>
+                          {isOnline ? 'Online' : 'Tatap Muka'}
+                        </span>
+                        <span style={{ fontWeight: 600, fontSize: 14 }}>{r.slot_label}</span>
+                      </div>
+                      <span className={'chip' + (r.status === 'Baru' ? ' warn' : r.status === 'Selesai' ? ' ok' : '')}>{r.status}</span>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </form>

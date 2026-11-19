@@ -110,9 +110,10 @@ export async function toggleCode(f: FormData) {
 export async function addSlot(f: FormData) {
   const g = await requireGuru();
   const label = txt(f, 'label', 80);
+  const mode = txt(f, 'mode', 10) === 'online' ? 'online' : 'offline';
   if (!label) return;
   try {
-    await admin().from('consult_slots').insert({ owner_id: g.user_id, label });
+    await admin().from('consult_slots').insert({ owner_id: g.user_id, label, mode });
     revalidateTag('consult-slots');
     revalidatePath('/guru');
     revalidatePath('/siswa/bantuan');

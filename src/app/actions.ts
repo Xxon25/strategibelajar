@@ -226,7 +226,7 @@ export async function requestConsult(f: FormData) {
     const sb = admin();
     const { data: code } = await sb.from('school_codes').select('owner_id').eq('code', s.school_code).maybeSingle();
     const { data: slot } = code
-      ? await sb.from('consult_slots').select('label').eq('id', slotId).eq('owner_id', code.owner_id).eq('active', true).maybeSingle()
+      ? await sb.from('consult_slots').select('label,mode').eq('id', slotId).eq('owner_id', code.owner_id).eq('active', true).maybeSingle()
       : { data: null };
     if (!slot) {
       errKey = 'slot';
@@ -235,7 +235,11 @@ export async function requestConsult(f: FormData) {
       if (open && open.length) {
         errKey = 'ada';
       } else {
-        const { error } = await sb.from('consult_requests').insert({ student_id: s.id, slot_label: slot.label });
+        const { error } = await sb.from('consult_requests').insert({
+          student_id: s.id,
+          slot_label: slot.label,
+          mode: (slot as { label: string; mode: string }).mode ?? 'offline',
+        });
         if (error) {
           console.error('[requestConsult] Supabase error:', error.message);
           errKey = 'umum';

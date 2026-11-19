@@ -501,7 +501,15 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       <b style={{ fontSize: 13 }}>Jadwal Konsultasi ({os.length})</b>
                       {os.map((sl) => (
                         <div key={sl.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#fff', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--line)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                            <span style={{
+                              fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 99,
+                              background: (sl as typeof sl & { mode?: string }).mode === 'online' ? '#e8f7f5' : '#fff0ef',
+                              color: (sl as typeof sl & { mode?: string }).mode === 'online' ? '#2a9d8f' : '#e8524a',
+                              border: `1px solid ${(sl as typeof sl & { mode?: string }).mode === 'online' ? '#c0eae5' : '#fad9d7'}`,
+                            }}>
+                              {(sl as typeof sl & { mode?: string }).mode === 'online' ? 'Online' : 'Tatap Muka'}
+                            </span>
                             <span style={{ fontSize: 13, fontWeight: 700 }}>{sl.label}</span>
                             <span className={'chip' + (sl.active ? ' ok' : ' warn')} style={{ fontSize: 10 }}>{sl.active ? 'Aktif' : 'Nonaktif'}</span>
                           </div>
@@ -511,9 +519,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                           </form>
                         </div>
                       ))}
-                      <form action={adminAddSlot} style={{ display: 'flex', gap: 8 }}>
+                      <form action={adminAddSlot} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                         <input type="hidden" name="owner_id" value={c.user_id} />
-                        <input type="text" name="label" placeholder="Rabu, 13.00 – 14.00" required style={{ padding: '7px 10px', fontSize: 12 }} />
+                        <input type="text" name="label" placeholder="Rabu, 13.00 – 14.00" required style={{ padding: '7px 10px', fontSize: 12, flex: 1, minWidth: 140 }} />
+                        <select name="mode" style={{ padding: '7px 10px', fontSize: 12, borderRadius: 8, border: '1.5px solid var(--line)' }}>
+                          <option value="offline">Tatap Muka</option>
+                          <option value="online">Online</option>
+                        </select>
                         <button type="submit" style={{ ...btnIndigo, background: 'var(--sec)', fontSize: 12, padding: '7px 12px' }}>+ Jadwal</button>
                       </form>
                     </div>

@@ -23,8 +23,8 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
   let reflData: Refl[] = [];
   let quizData: Array<{ student_id: string; score: number; total: number }> = [];
   let daysData: Array<{ student_id: string }> = [];
-  let requests: Array<{ id: string; student_id: string; slot_label: string; status: string }> = [];
-  let slotsData: Array<{ id: string; label: string; active: boolean }> = [];
+  let requests: Array<{ id: string; student_id: string; slot_label: string; status: string; mode: string }> = [];
+  let slotsData: Array<{ id: string; label: string; active: boolean; mode: string }> = [];
 
   try {
     const { data: codesRes } = await sb.from('school_codes').select('*').eq('owner_id', g.user_id).order('created_at', { ascending: false });
@@ -41,8 +41,8 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
       ids.length ? sb.from('reflections').select('student_id,r1,r2,r3,barrier,support_flag,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
       ids.length ? sb.from('quiz_attempts').select('student_id,score,total,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
       ids.length ? sb.from('practice_days').select('student_id,day').in('student_id', ids).gte('day', monthStart) : { data: [] },
-      ids.length ? sb.from('consult_requests').select('id,student_id,slot_label,status,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
-      sb.from('consult_slots').select('*').eq('owner_id', g.user_id).order('created_at'),
+      ids.length ? sb.from('consult_requests').select('id,student_id,slot_label,status,mode,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
+      sb.from('consult_slots').select('id,label,active,mode').eq('owner_id', g.user_id).order('created_at'),
     ]);
     reflData = (reflRes.data ?? []) as Refl[];
     quizData = (quizRes.data ?? []) as typeof quizData;
@@ -336,7 +336,16 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
                         </div>
                         <span className={'chip' + (r.status === 'Baru' ? ' warn' : r.status === 'Selesai' ? ' ok' : '')}>{r.status}</span>
                       </div>
-                      <div style={{ background: 'var(--surface2)', borderRadius: 'var(--r)', padding: '10px 14px', fontSize: 13 }}>
+                      <div style={{ background: 'var(--surface2)', borderRadius: 'var(--r)', padding: '10px 14px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
+                          background: r.mode === 'online' ? '#e8f7f5' : '#fff0ef',
+                          color: r.mode === 'online' ? '#2a9d8f' : '#e8524a',
+                          border: `1px solid ${r.mode === 'online' ? '#c0eae5' : '#fad9d7'}`,
+                          whiteSpace: 'nowrap',
+                        }}>
+                          {r.mode === 'online' ? 'Online' : 'Tatap Muka'}
+                        </span>
                         <span style={{ color: 'var(--muted)' }}>Jadwal dipilih: </span>
                         <span style={{ fontWeight: 700 }}>{r.slot_label}</span>
                       </div>
@@ -425,8 +434,19 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
                     border: `1.5px solid ${sl.active ? 'var(--line)' : 'var(--warn-line)'}`,
                     borderRadius: 'var(--r-lg)', boxShadow: 'var(--shadow-sm)',
                   }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--ink2)' }}>{sl.label}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 2 }}>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
+                          background: sl.mode === 'online' ? '#e8f7f5' : '#fff0ef',
+                          color: sl.mode === 'online' ? '#2a9d8f' : '#e8524a',
+                          border: `1px solid ${sl.mode === 'online' ? '#c0eae5' : '#fad9d7'}`,
+                          whiteSpace: 'nowrap',
+                        }}>
+                          {sl.mode === 'online' ? 'Online' : 'Tatap Muka'}
+                        </span>
+                        <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--ink2)' }}>{sl.label}</span>
+                      </div>
                     </div>
                     <span className={'chip' + (sl.active ? ' ok' : ' warn')} style={{ fontSize: 11 }}>
                       {sl.active ? '● Aktif' : '○ Nonaktif'}
@@ -443,9 +463,18 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
             )}
             <form action={addSlot} className="card" style={{ borderTop: '3px solid var(--sec)' }}>
               <h3>Tambah jadwal</h3>
-              <div>
-                <label className="q" htmlFor="label">Jadwal konsultasi</label>
-                <input type="text" id="label" name="label" maxLength={80} placeholder="Contoh: Jumat, 10.00 – 11.00" required />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end' }}>
+                <div>
+                  <label className="q" htmlFor="label">Jadwal konsultasi</label>
+                  <input type="text" id="label" name="label" maxLength={80} placeholder="Contoh: Jumat, 10.00 – 11.00" required />
+                </div>
+                <div>
+                  <label className="q" htmlFor="mode">Mode</label>
+                  <select id="mode" name="mode" style={{ height: 46 }}>
+                    <option value="offline">Tatap Muka</option>
+                    <option value="online">Online</option>
+                  </select>
+                </div>
               </div>
               <Submit pendingText="Menambah…">Tambah jadwal</Submit>
             </form>

@@ -127,8 +127,8 @@ export const slotsForCode = unstable_cache(
       const sb = admin();
       const { data: c } = await sb.from('school_codes').select('owner_id').eq('code', code).maybeSingle();
       if (!c) return [];
-      const { data } = await sb.from('consult_slots').select('id,label').eq('owner_id', c.owner_id).eq('active', true).order('created_at');
-      return (data ?? []) as Array<{ id: string; label: string }>;
+      const { data } = await sb.from('consult_slots').select('id,label,mode').eq('owner_id', c.owner_id).eq('active', true).order('mode').order('created_at');
+      return (data ?? []) as Array<{ id: string; label: string; mode: 'online' | 'offline' }>;
     } catch (err) {
       console.error('[slotsForCode] Gagal memuat jadwal konsultasi:', err);
       return [];

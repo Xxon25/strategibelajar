@@ -282,9 +282,10 @@ export async function adminAddSlot(f: FormData) {
   await requireAdmin();
   const ownerId = txt(f, 'owner_id', 60);
   const label = txt(f, 'label', 80);
+  const mode = txt(f, 'mode', 10) === 'online' ? 'online' : 'offline';
   if (!ownerId || !label) return;
   try {
-    await admin().from('consult_slots').insert({ owner_id: ownerId, label });
+    await admin().from('consult_slots').insert({ owner_id: ownerId, label, mode });
     revalidateTag('consult-slots');
     revalidatePath('/admin');
     revalidatePath('/guru');
