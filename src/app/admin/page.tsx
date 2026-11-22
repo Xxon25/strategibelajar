@@ -19,6 +19,7 @@ import Submit from '@/components/Submit';
 import AddCounselorForm from '@/components/AddCounselorForm';
 import { DeleteCounselorForm, DeleteStudentForm, DeleteAllStudentsForm } from '@/components/AdminActions';
 import CopyButton from '@/components/CopyButton';
+import ConsultChat from '@/components/ConsultChat';
 
 type SP = { tab?: string; ok?: string; kelas?: string; kode?: string };
 
@@ -69,7 +70,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   try {
     if (tab === 'konten') {
-      const contentRes = await sb.from('site_content').select('key,value').order('key');
+      const contentRes = await sb.from('site_content').select('key,value').not('key', 'like', 'chat:%').order('key');
       contents = Object.fromEntries((contentRes.data ?? []).map((r) => [r.key, r.value]));
     } else if (tab === 'view') {
       const [cRes, sRes, codeRes] = await Promise.all([
@@ -673,6 +674,15 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                             </form>
                           ))}
                         </div>
+                        <ConsultChat
+                          requestId={r.id}
+                          viewerRole="guru"
+                          viewerName={`${a.name} (BK)`}
+                          partnerLabel={`${s?.nickname ?? 'Siswa'} (${s?.class ?? '-'})`}
+                          slotLabel={r.slot_label}
+                          status={r.status}
+                          defaultOpen={false}
+                        />
                       </div>
                     );
                   })}

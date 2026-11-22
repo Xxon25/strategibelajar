@@ -8,6 +8,7 @@ import { logoutGuru, setRequestStatus, newCode, toggleCode, addSlot, toggleSlot,
 import { exitPreview } from '@/app/admin-actions';
 import Submit from '@/components/Submit';
 import CopyButton from '@/components/CopyButton';
+import ConsultChat from '@/components/ConsultChat';
 
 type SP = { tab?: string; kelas?: string; hb?: string };
 type Refl = { student_id: string; r1: string; r2: string; r3: string; barrier: keyof typeof BARRIER; support_flag: boolean; created_at: string };
@@ -464,6 +465,15 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
                           </form>
                         ))}
                       </div>
+                      <ConsultChat
+                        requestId={r.id}
+                        viewerRole="guru"
+                        viewerName={g.name}
+                        partnerLabel={`${s?.nickname ?? 'Siswa'} (${s?.class ?? '-'})`}
+                        slotLabel={r.slot_label}
+                        status={r.status}
+                        defaultOpen={requests.length === 1 || r.status !== 'Selesai'}
+                      />
                     </div>
                   );
                 })}

@@ -84,7 +84,7 @@ export const studentData = cache(async (id: string) => {
       sb.from('student_plans').select('*').eq('student_id', id).maybeSingle(),
       sb.from('quiz_attempts').select('score,total').eq('student_id', id).order('created_at', { ascending: false }).limit(1),
       sb.from('reflections').select('id,r1,r2,r3,barrier,support_flag,created_at').eq('student_id', id).order('created_at', { ascending: false }).limit(5),
-      sb.from('consult_requests').select('id,slot_label,status,mode,room_info,reschedule_note,meet_link,confirmed_time,created_at').eq('student_id', id).order('created_at', { ascending: false }),
+      sb.from('consult_requests').select('id,slot_label,status,mode,room_info,reschedule_note,meet_link,confirmed_time,student_note,created_at').eq('student_id', id).order('created_at', { ascending: false }),
       sb.from('practice_days').select('day').eq('student_id', id).gte('day', monthStart),
     ]);
     return {
@@ -110,7 +110,7 @@ export const studentData = cache(async (id: string) => {
 export const getSiteContent = unstable_cache(
   async (): Promise<Record<string, string>> => {
     try {
-      const { data } = await admin().from('site_content').select('key,value');
+      const { data } = await admin().from('site_content').select('key,value').not('key', 'like', 'chat:%');
       return Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
     } catch {
       return {};

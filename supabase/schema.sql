@@ -137,6 +137,19 @@ create table if not exists consult_requests (
 );
 
 -- ─────────────────────────────────────────────
+-- PESAN LIVE CHAT KONSULTASI
+-- ─────────────────────────────────────────────
+create table if not exists consult_messages (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid not null references consult_requests(id) on delete cascade,
+  sender_role text not null check (sender_role in ('siswa','guru')),
+  sender_name text not null,
+  message text not null check (char_length(message) between 1 and 1000),
+  created_at timestamptz not null default now()
+);
+create index if not exists consult_messages_req_idx on consult_messages(request_id, created_at asc);
+
+-- ─────────────────────────────────────────────
 -- HARI BERLATIH
 -- ─────────────────────────────────────────────
 create table if not exists practice_days (
@@ -158,6 +171,7 @@ alter table student_plans enable row level security;
 alter table quiz_attempts enable row level security;
 alter table reflections enable row level security;
 alter table consult_requests enable row level security;
+alter table consult_messages enable row level security;
 alter table practice_days enable row level security;
 
 -- ─────────────────────────────────────────────
