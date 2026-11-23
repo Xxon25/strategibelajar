@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/session';
-import { admin } from '@/lib/supabase-admin';
+import { adminTabData, type AdminTab } from '@/lib/data';
 import {
   logoutAdmin,
   saveContent,
@@ -22,27 +22,7 @@ import CopyButton from '@/components/CopyButton';
 import ConsultChat from '@/components/ConsultChat';
 
 type SP = { tab?: string; ok?: string; kelas?: string; kode?: string };
-
-type Counselor = { user_id: string; name: string; school_name: string; created_at: string };
-type StudentRow = {
-  id: string; nickname: string; class: string; school_code: string; consent_at: string | null;
-  share_summary: boolean; include_reflection: boolean; created_at: string;
-};
-type Code = { code: string; owner_id: string; note: string; active: boolean; created_at: string };
-type Slot = { id: string; owner_id: string; label: string; active: boolean; created_at: string };
-type PlanRow = {
-  student_id: string; habits_done: string[]; habit_focus: string; goal: string; sched_topic: string;
-  sched_start: string | null; strategies: string[]; focus_notif: string; focus_place: string; focus_tools: string;
-};
-type QuizRow = { id: string; student_id: string; score: number; total: number; created_at: string };
-type ReflRow = {
-  id: string; student_id: string; r1: string; r2: string; r3: string;
-  barrier: keyof typeof BARRIER; support_flag: boolean; created_at: string;
-};
-type ReqRow = { id: string; student_id: string; slot_label: string; status: string; created_at: string };
-
 const VALID_TABS = ['overview', 'view', 'guru', 'siswa', 'konsul', 'konten'] as const;
-type Tab = (typeof VALID_TABS)[number];
 
 const btnIndigo: React.CSSProperties = {
   padding: '8px 14px', borderRadius: 10, background: '#4f46e5', color: '#fff',
@@ -53,105 +33,33 @@ const btnCoral: React.CSSProperties = { ...btnIndigo, background: 'var(--accent)
 export default async function AdminPage({ searchParams }: { searchParams: Promise<SP> }) {
   const a = await requireAdmin();
   const sp = await searchParams;
-  const tab: Tab = (VALID_TABS as readonly string[]).includes(sp.tab ?? '') ? (sp.tab as Tab) : 'overview';
-  const sb = admin();
+  const tab: AdminTab = (VALID_TABS as readonly string[]).includes(sp.tab ?? '') ? (sp.tab as AdminTab) : 'overview';
 
-  let counselors: Counselor[] = [];
-  let students: StudentRow[] = [];
-  let codes: Code[] = [];
-  let slots: Slot[] = [];
-  let plans: PlanRow[] = [];
-  let quizzes: QuizRow[] = [];
-  let reflections: ReflRow[] = [];
-  let requests: ReqRow[] = [];
-  let practiceDays: Array<{ student_id: string; day: string }> = [];
-  let contents: Record<string, string> = {};
-  let dbError: string | null = null;
-
-  try {
-    if (tab === 'konten') {
-      const contentRes = await sb.from('site_content').select('key,value').not('key', 'like', 'chat:%').order('key');
-      contents = Object.fromEntries((contentRes.data ?? []).map((r) => [r.key, r.value]));
-    } else if (tab === 'view') {
-      const [cRes, sRes, codeRes] = await Promise.all([
-        sb.from('counselors').select('user_id,name,school_name,created_at').order('created_at', { ascending: false }),
-        sb.from('students').select('id,nickname,class,school_code,consent_at,share_summary,include_reflection,created_at').order('created_at', { ascending: false }),
-        sb.from('school_codes').select('code,owner_id,note,active,created_at'),
-      ]);
-      counselors = (cRes.data ?? []) as Counselor[];
-      students = (sRes.data ?? []) as StudentRow[];
-      codes = (codeRes.data ?? []) as Code[];
-    } else if (tab === 'guru') {
-      const [cRes, sRes, codeRes, slotRes] = await Promise.all([
-        sb.from('counselors').select('user_id,name,school_name,created_at').order('created_at', { ascending: false }),
-        sb.from('students').select('id,school_code'),
-        sb.from('school_codes').select('code,owner_id,note,active,created_at').order('created_at', { ascending: false }),
-        sb.from('consult_slots').select('id,owner_id,label,active,created_at').order('created_at'),
-      ]);
-      counselors = (cRes.data ?? []) as Counselor[];
-      students = (sRes.data ?? []) as StudentRow[];
-      codes = (codeRes.data ?? []) as Code[];
-      slots = (slotRes.data ?? []) as Slot[];
-    } else if (tab === 'konsul') {
-      const [sRes, reflRes, reqRes] = await Promise.all([
-        sb.from('students').select('id,nickname,class,school_code'),
-        sb.from('reflections').select('id,student_id,r1,r2,r3,barrier,support_flag,created_at').order('created_at', { ascending: false }).limit(30),
-        sb.from('consult_requests').select('id,student_id,slot_label,status,created_at').order('created_at', { ascending: false }),
-      ]);
-      students = (sRes.data ?? []) as StudentRow[];
-      reflections = (reflRes.data ?? []) as ReflRow[];
-      requests = (reqRes.data ?? []) as ReqRow[];
-    } else if (tab === 'overview') {
-      const [cRes, sRes, codeRes, slotRes, reflRes, reqRes] = await Promise.all([
-        sb.from('counselors').select('user_id,name,school_name,created_at').order('created_at', { ascending: false }),
-        sb.from('students').select('id,nickname,class,school_code,consent_at').order('created_at', { ascending: false }),
-        sb.from('school_codes').select('code,owner_id,note,active,created_at'),
-        sb.from('consult_slots').select('id,owner_id'),
-        sb.from('reflections').select('id,student_id,r1,r2,r3,barrier,support_flag,created_at').order('created_at', { ascending: false }),
-        sb.from('consult_requests').select('id,status'),
-      ]);
-      counselors = (cRes.data ?? []) as Counselor[];
-      students = (sRes.data ?? []) as StudentRow[];
-      codes = (codeRes.data ?? []) as Code[];
-      slots = (slotRes.data ?? []) as Slot[];
-      reflections = (reflRes.data ?? []) as ReflRow[];
-      requests = (reqRes.data ?? []) as ReqRow[];
-      if (cRes.error) dbError = `DB Error: ${cRes.error.message}`;
-    } else {
-      // tab === 'siswa'
-      const [cRes, sRes, codeRes, planRes, quizRes, reflRes, dayRes] = await Promise.all([
-        sb.from('counselors').select('user_id,name,school_name,created_at'),
-        sb.from('students').select('id,nickname,class,school_code,consent_at,share_summary,include_reflection,created_at').order('created_at', { ascending: false }),
-        sb.from('school_codes').select('code,owner_id,note,active,created_at'),
-        sb.from('student_plans').select('*'),
-        sb.from('quiz_attempts').select('id,student_id,score,total,created_at').order('created_at', { ascending: false }),
-        sb.from('reflections').select('id,student_id,r1,r2,r3,barrier,support_flag,created_at').order('created_at', { ascending: false }),
-        sb.from('practice_days').select('student_id,day'),
-      ]);
-      counselors = (cRes.data ?? []) as Counselor[];
-      students = (sRes.data ?? []) as StudentRow[];
-      codes = (codeRes.data ?? []) as Code[];
-      plans = (planRes.data ?? []) as PlanRow[];
-      quizzes = (quizRes.data ?? []) as QuizRow[];
-      reflections = (reflRes.data ?? []) as ReflRow[];
-      practiceDays = (dayRes.data ?? []) as Array<{ student_id: string; day: string }>;
-    }
-  } catch (e) {
-    console.error('[AdminPage] Gagal memuat data:', e);
-    dbError = `Gagal memuat data dari Supabase. (${e})`;
-  }
+  const {
+    counselors,
+    students,
+    codes,
+    slots,
+    plans,
+    quizzes,
+    reflections,
+    requests,
+    practiceDays,
+    contents,
+    dbError,
+  } = await adminTabData(tab);
 
   /* ── Lookups ── */
   const studentsByCode = new Map<string, number>();
   for (const s of students) studentsByCode.set(s.school_code, (studentsByCode.get(s.school_code) ?? 0) + 1);
-  const codesByOwner = new Map<string, Code[]>();
+  const codesByOwner = new Map<string, typeof codes>();
   for (const c of codes) codesByOwner.set(c.owner_id, [...(codesByOwner.get(c.owner_id) ?? []), c]);
-  const slotsByOwner = new Map<string, Slot[]>();
+  const slotsByOwner = new Map<string, typeof slots>();
   for (const sl of slots) slotsByOwner.set(sl.owner_id, [...(slotsByOwner.get(sl.owner_id) ?? []), sl]);
   const planByStudent = new Map(plans.map((p) => [p.student_id, p]));
-  const lastQuiz = new Map<string, QuizRow>();
+  const lastQuiz = new Map<string, (typeof quizzes)[number]>();
   for (const q of quizzes) if (!lastQuiz.has(q.student_id)) lastQuiz.set(q.student_id, q);
-  const reflsByStudent = new Map<string, ReflRow[]>();
+  const reflsByStudent = new Map<string, typeof reflections>();
   for (const r of reflections) reflsByStudent.set(r.student_id, [...(reflsByStudent.get(r.student_id) ?? []), r]);
   const daysByStudent = new Map<string, number>();
   for (const d of practiceDays) daysByStudent.set(d.student_id, (daysByStudent.get(d.student_id) ?? 0) + 1);
@@ -171,7 +79,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     return true;
   });
 
-  const tabs: Array<[Tab, string, number | undefined]> = [
+  const tabs: Array<[AdminTab, string, number | undefined]> = [
     ['overview', 'Overview', undefined],
     ['view', 'Lihat View Guru & Murid', undefined],
     ['guru', 'Guru BK', counselors.length],
@@ -252,7 +160,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           {tabs.map(([k, label, badge]) => {
             const on = tab === k;
             return (
-              <Link key={k} href={`/admin?tab=${k}`} style={{
+              <Link key={k} href={`/admin?tab=${k}`} prefetch={true} style={{
                 padding: '9px 16px', borderRadius: 'var(--r)',
                 border: `1.5px solid ${on ? '#4f46e5' : 'var(--line)'}`,
                 background: on ? 'linear-gradient(135deg,#4f46e5,#6366f1)' : 'var(--surface)',

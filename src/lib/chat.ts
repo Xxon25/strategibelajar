@@ -58,6 +58,56 @@ export async function getChatMessages(requestId: string): Promise<ChatMessage[]>
   }
 }
 
+export async function getChatMessagesMap(requestIds: string[]): Promise<Map<string, ChatMessage[]>> {
+  const result = new Map<string, ChatMessage[]>();
+  if (requestIds.length === 0) return result;
+  const sb = admin();
+
+  if (_hasNativeTable !== false) {
+    try {
+      const { data, error } = await sb
+        .from('consult_messages')
+        .select('id,request_id,sender_role,sender_name,message,created_at')
+        .in('request_id', requestIds)
+        .order('created_at', { ascending: true });
+
+      if (!error) {
+        _hasNativeTable = true;
+        for (const msg of (data ?? []) as ChatMessage[]) {
+          const list = result.get(msg.request_id);
+          if (list) list.push(msg);
+          else result.set(msg.request_id, [msg]);
+        }
+        return result;
+      }
+      if (error.code === 'PGRST205' || error.code === '42P01') {
+        _hasNativeTable = false;
+      }
+    } catch (err) {
+      console.error('[getChatMessagesMap] Error:', err);
+    }
+  }
+
+  try {
+    const { data } = await sb
+      .from('site_content')
+      .select('key,value')
+      .in('key', requestIds.map(chatKey));
+    for (const row of data ?? []) {
+      const reqId = String(row.key).replace(/^chat:/, '');
+      try {
+        const parsed = JSON.parse(String(row.value));
+        if (Array.isArray(parsed)) result.set(reqId, parsed as ChatMessage[]);
+      } catch {
+        /* abaikan JSON rusak */
+      }
+    }
+  } catch (err) {
+    console.error('[getChatMessagesMap] Fallback error:', err);
+  }
+  return result;
+}
+
 export async function appendChatMessage(input: {
   requestId: string;
   senderRole: 'siswa' | 'guru';

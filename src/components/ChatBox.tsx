@@ -69,6 +69,42 @@ export default function ChatBox({
     };
   }, [requestId]);
 
+  /* ── Sync fallback via /api/chat saat tab aktif (jika tabel chat_messages / Realtime belum aktif) ── */
+  useEffect(() => {
+    const asRole = myRole === 'counselor' ? 'guru' : 'siswa';
+    const sync = async () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        const res = await fetch(`/api/chat?requestId=${encodeURIComponent(requestId)}&as=${asRole}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const json = (await res.json()) as {
+          messages?: Array<{ id: string; sender_role: 'siswa' | 'guru'; message: string; created_at: string }>;
+        };
+        if (!Array.isArray(json.messages) || json.messages.length === 0) return;
+        const mapped: Message[] = json.messages.map((m) => ({
+          id: m.id,
+          sender_role: m.sender_role === 'guru' ? 'counselor' : 'student',
+          body: m.message,
+          created_at: m.created_at,
+        }));
+        setMessages((prev) => {
+          const pendingOpts = prev.filter((p) => p.id.startsWith('opt-'));
+          const seen = new Set(prev.filter((p) => !p.id.startsWith('opt-')).map((p) => p.id));
+          if (mapped.every((m) => seen.has(m.id)) && prev.length - pendingOpts.length === mapped.length) {
+            return prev;
+          }
+          const serverBodies = new Set(mapped.map((m) => `${m.sender_role}|${m.body}`));
+          const remainingOpts = pendingOpts.filter((p) => !serverBodies.has(`${p.sender_role}|${p.body}`));
+          return [...mapped, ...remainingOpts];
+        });
+      } catch {
+        /* abaikan error jaringan sementara */
+      }
+    };
+    const id = setInterval(sync, 3500);
+    return () => clearInterval(id);
+  }, [requestId, myRole]);
+
   /* ── Kirim pesan ── */
   function handleSend() {
     const body = input.trim();

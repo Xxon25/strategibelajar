@@ -157,6 +157,15 @@ create table if not exists consult_messages (
 );
 create index if not exists consult_messages_req_idx on consult_messages(request_id, created_at asc);
 
+create table if not exists chat_messages (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid not null references consult_requests(id) on delete cascade,
+  sender_role text not null check (sender_role in ('student','counselor')),
+  body text not null check (char_length(body) between 1 and 2000),
+  created_at timestamptz not null default now()
+);
+create index if not exists chat_request_idx on chat_messages(request_id, created_at);
+
 -- ─────────────────────────────────────────────
 -- HARI BERLATIH
 -- ─────────────────────────────────────────────
@@ -180,7 +189,16 @@ alter table quiz_attempts enable row level security;
 alter table reflections enable row level security;
 alter table consult_requests enable row level security;
 alter table consult_messages enable row level security;
+alter table chat_messages enable row level security;
 alter table practice_days enable row level security;
+
+-- Pastikan service_role dan postgres memiliki izin akses ke semua tabel/sequence public
+grant usage on schema public to postgres, anon, authenticated, service_role;
+grant all privileges on all tables in schema public to postgres, service_role;
+grant all privileges on all sequences in schema public to postgres, service_role;
+grant all privileges on all routines in schema public to postgres, service_role;
+alter default privileges for role postgres in schema public grant all privileges on tables to postgres, service_role;
+alter default privileges for role postgres in schema public grant all privileges on sequences to postgres, service_role;
 
 -- ─────────────────────────────────────────────
 -- BUAT AKUN ADMIN  (contoh@admin.id / admin1234)

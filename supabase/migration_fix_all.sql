@@ -39,7 +39,7 @@ alter table consult_requests
 alter table consult_requests
   add column if not exists confirmed_time text not null default '';
 
--- ── 3. Buat tabel consult_messages jika belum ada ──
+-- ── 3. Buat tabel consult_messages & chat_messages jika belum ada ──
 create table if not exists consult_messages (
   id uuid primary key default gen_random_uuid(),
   request_id uuid not null references consult_requests(id) on delete cascade,
@@ -52,8 +52,27 @@ create table if not exists consult_messages (
 create index if not exists consult_messages_req_idx
   on consult_messages(request_id, created_at asc);
 
--- ── 4. Aktifkan RLS pada tabel baru ──
+create table if not exists chat_messages (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid not null references consult_requests(id) on delete cascade,
+  sender_role text not null check (sender_role in ('student','counselor')),
+  body text not null check (char_length(body) between 1 and 2000),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists chat_request_idx
+  on chat_messages(request_id, created_at);
+
+-- ── 4. Aktifkan RLS & GRANT akses service_role pada tabel public ──
 alter table consult_messages enable row level security;
+alter table chat_messages enable row level security;
+
+grant usage on schema public to postgres, anon, authenticated, service_role;
+grant all privileges on all tables in schema public to postgres, service_role;
+grant all privileges on all sequences in schema public to postgres, service_role;
+grant all privileges on all routines in schema public to postgres, service_role;
+alter default privileges for role postgres in schema public grant all privileges on tables to postgres, service_role;
+alter default privileges for role postgres in schema public grant all privileges on sequences to postgres, service_role;
 
 -- ── 5. Pastikan site_content ada (untuk fallback chat) ──
 -- Tabel sudah ada tapi pastikan tidak error jika sudah ada

@@ -6,6 +6,7 @@ import { randomBytes } from 'crypto';
 import { admin } from '@/lib/supabase-admin';
 import { supabaseAuth } from '@/lib/supabase-server';
 import { requireGuru } from '@/lib/session';
+import { CACHE_TAGS, invalidateTags } from '@/lib/cache';
 import { STATUSES } from '@/lib/constants';
 import type { FormState } from './actions';
 
@@ -69,6 +70,7 @@ export async function setRequestStatus(f: FormData) {
     const { data: r } = await sb.from('consult_requests').select('student_id').eq('id', id).maybeSingle();
     if (!r || !(await ownsStudent(g.user_id, r.student_id))) return;
     await sb.from('consult_requests').update({ status }).eq('id', id);
+    invalidateTags(CACHE_TAGS.guruDash, CACHE_TAGS.guru(g.user_id), CACHE_TAGS.adminDash, CACHE_TAGS.student(r.student_id));
     revalidatePath('/guru');
     revalidatePath('/siswa/bantuan');
   } catch (err) {
@@ -95,6 +97,7 @@ export async function replyRequest(f: FormData) {
       patch.status         = 'Dijadwalkan';
     }
     await sb.from('consult_requests').update(patch).eq('id', id);
+    invalidateTags(CACHE_TAGS.guruDash, CACHE_TAGS.guru(g.user_id), CACHE_TAGS.adminDash, CACHE_TAGS.student(r.student_id));
     revalidatePath('/guru');
     revalidatePath('/siswa/bantuan');
   } catch (err) {
@@ -113,6 +116,7 @@ export async function newCode(f: FormData) {
       const { error } = await admin().from('school_codes').insert({ code, owner_id: g.user_id, note });
       if (!error) break;
     }
+    invalidateTags(CACHE_TAGS.guruDash, CACHE_TAGS.guru(g.user_id), CACHE_TAGS.adminDash);
     revalidatePath('/guru');
   } catch (err) {
     console.error('[newCode] Error:', err);
@@ -127,6 +131,7 @@ export async function toggleCode(f: FormData) {
     const { data: c } = await sb.from('school_codes').select('active').eq('code', code).eq('owner_id', g.user_id).maybeSingle();
     if (!c) return;
     await sb.from('school_codes').update({ active: !c.active }).eq('code', code).eq('owner_id', g.user_id);
+    invalidateTags(CACHE_TAGS.guruDash, CACHE_TAGS.guru(g.user_id), CACHE_TAGS.adminDash);
     revalidatePath('/guru');
   } catch (err) {
     console.error('[toggleCode] Error:', err);
@@ -140,6 +145,7 @@ export async function addSlot(f: FormData) {
   if (!label) return;
   try {
     await admin().from('consult_slots').insert({ owner_id: g.user_id, label, mode });
+    invalidateTags(CACHE_TAGS.consultSlots, CACHE_TAGS.guruDash, CACHE_TAGS.guru(g.user_id), CACHE_TAGS.adminDash);
     revalidateTag('consult-slots');
     revalidatePath('/guru');
     revalidatePath('/siswa/bantuan');
@@ -156,6 +162,7 @@ export async function toggleSlot(f: FormData) {
     const { data: s } = await sb.from('consult_slots').select('active').eq('id', id).eq('owner_id', g.user_id).maybeSingle();
     if (!s) return;
     await sb.from('consult_slots').update({ active: !s.active }).eq('id', id).eq('owner_id', g.user_id);
+    invalidateTags(CACHE_TAGS.consultSlots, CACHE_TAGS.guruDash, CACHE_TAGS.guru(g.user_id), CACHE_TAGS.adminDash);
     revalidateTag('consult-slots');
     revalidatePath('/guru');
     revalidatePath('/siswa/bantuan');

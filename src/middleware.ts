@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { getCachedJwks } from '@/lib/jwks';
 
 export async function middleware(req: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -7,7 +8,7 @@ export async function middleware(req: NextRequest) {
   let res = NextResponse.next({ request: req });
   if (!url || !anon) return res;
 
-  // Fast-path: lewati round-trip jaringan ke Supabase jika tidak ada cookie sesi Auth (sb-*)
+  // Fast-path: lewati jika tidak ada cookie sesi Auth (sb-*)
   const allCookies = req.cookies.getAll();
   const hasAuthCookie = allCookies.some((c) => c.name.startsWith('sb-'));
   if (!hasAuthCookie) return res;
@@ -23,7 +24,12 @@ export async function middleware(req: NextRequest) {
         },
       },
     });
-    await sb.auth.getUser();
+    // Verifikasi lokal (< 1ms) dengan JWKS cache; auto-refresh hanya jika token kedaluwarsa.
+    const jwks = await getCachedJwks(url);
+    const { error } = await sb.auth.getClaims(undefined, jwks ? { jwks } : undefined);
+    if (error) {
+      await sb.auth.getUser();
+    }
   } catch (err) {
     console.error('[middleware] Gagal menyegarkan sesi Supabase:', err);
   }

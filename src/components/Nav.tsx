@@ -49,7 +49,7 @@ export function BottomNav() {
   return (
     <nav className="bottom" aria-label="Menu utama">
       {ITEMS.map((i) => (
-        <Link key={i.href} href={i.href} aria-current={i.on(p) ? 'page' : undefined}>
+        <Link key={i.href} href={i.href} prefetch={true} aria-current={i.on(p) ? 'page' : undefined}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             {ICON[i.icon]}
           </svg>
@@ -77,7 +77,7 @@ export function SubTabs() {
   return (
     <div className="subtabs" role="navigation" aria-label="Submenu">
       {tabs.map((t) => (
-        <Link key={t.href} href={t.href} className="subtab" aria-current={p === t.href ? 'page' : undefined}>
+        <Link key={t.href} href={t.href} prefetch={true} className="subtab" aria-current={p === t.href ? 'page' : undefined}>
           {t.label}
         </Link>
       ))}

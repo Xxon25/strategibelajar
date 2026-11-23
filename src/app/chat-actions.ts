@@ -3,9 +3,13 @@
 import { revalidatePath } from 'next/cache';
 import { admin } from '@/lib/supabase-admin';
 import { getStudent, getGuru } from '@/lib/session';
+import { appendChatMessage, getChatMessages } from '@/lib/chat';
 
 const txt = (f: FormData, k: string, max: number) =>
   String(f.get(k) ?? '').trim().slice(0, max);
+
+const isMissingTable = (err: { code?: string } | null) =>
+  err?.code === 'PGRST205' || err?.code === '42P01';
 
 /** Siswa mengirim pesan */
 export async function sendStudentMessage(f: FormData) {
@@ -30,7 +34,19 @@ export async function sendStudentMessage(f: FormData) {
     const { error } = await sb
       .from('chat_messages')
       .insert({ request_id: requestId, sender_role: 'student', body });
-    if (error) return { error: 'Gagal mengirim pesan.' };
+    if (error) {
+      if (isMissingTable(error)) {
+        const saved = await appendChatMessage({
+          requestId,
+          senderRole: 'siswa',
+          senderName: s.nickname,
+          message: body,
+        });
+        if (!saved) return { error: 'Gagal mengirim pesan.' };
+      } else {
+        return { error: 'Gagal mengirim pesan.' };
+      }
+    }
 
     revalidatePath(`/siswa/chat/${requestId}`);
     return { ok: true };
@@ -76,7 +92,19 @@ export async function sendGuruMessage(f: FormData) {
     const { error } = await sb
       .from('chat_messages')
       .insert({ request_id: requestId, sender_role: 'counselor', body });
-    if (error) return { error: 'Gagal mengirim pesan.' };
+    if (error) {
+      if (isMissingTable(error)) {
+        const saved = await appendChatMessage({
+          requestId,
+          senderRole: 'guru',
+          senderName: g.name,
+          message: body,
+        });
+        if (!saved) return { error: 'Gagal mengirim pesan.' };
+      } else {
+        return { error: 'Gagal mengirim pesan.' };
+      }
+    }
 
     revalidatePath(`/guru/chat/${requestId}`);
     return { ok: true };
@@ -88,18 +116,30 @@ export async function sendGuruMessage(f: FormData) {
 /** Ambil semua pesan untuk satu request (server-side, untuk SSR awal) */
 export async function getMessages(requestId: string) {
   try {
-    const { data } = await admin()
+    const { data, error } = await admin()
       .from('chat_messages')
       .select('id, sender_role, body, created_at')
       .eq('request_id', requestId)
       .order('created_at', { ascending: true })
       .limit(200);
-    return (data ?? []) as Array<{
-      id: string;
-      sender_role: 'student' | 'counselor';
-      body: string;
-      created_at: string;
-    }>;
+    if (!error) {
+      return (data ?? []) as Array<{
+        id: string;
+        sender_role: 'student' | 'counselor';
+        body: string;
+        created_at: string;
+      }>;
+    }
+    if (isMissingTable(error)) {
+      const msgs = await getChatMessages(requestId);
+      return msgs.map((m) => ({
+        id: m.id,
+        sender_role: (m.sender_role === 'guru' ? 'counselor' : 'student') as 'student' | 'counselor',
+        body: m.message,
+        created_at: m.created_at,
+      }));
+    }
+    return [];
   } catch {
     return [];
   }

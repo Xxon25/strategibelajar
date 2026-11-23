@@ -6,12 +6,18 @@ import { revalidatePath } from 'next/cache';
 import { randomBytes } from 'crypto';
 import { admin } from '@/lib/supabase-admin';
 import { STUDENT_COOKIE, hash, getStudent, type Student } from '@/lib/session';
+import { CACHE_TAGS, invalidateTags } from '@/lib/cache';
 import { CLASSES, CRISIS, HABIT_IDS, STRATEGY_IDS, QUIZ, isBarrier } from '@/lib/constants';
 import { fmtDate, todayJakarta } from '@/lib/util';
 
 export type FormState = { error?: string } | undefined;
 
 const txt = (f: FormData, k: string, max: number) => String(f.get(k) ?? '').trim().slice(0, max);
+
+async function invalidateStudentSessionTag() {
+  const token = (await cookies()).get(STUDENT_COOKIE)?.value;
+  if (token) invalidateTags(CACHE_TAGS.studentToken(hash(token)));
+}
 
 async function me(opts?: { consent?: boolean }): Promise<Student> {
   const s = await getStudent();
@@ -70,6 +76,7 @@ export async function registerStudent(_: FormState, f: FormData): Promise<FormSt
       path: '/',
       maxAge: 60 * 60 * 24 * 180,
     });
+    invalidateTags(CACHE_TAGS.students, CACHE_TAGS.guruDash, CACHE_TAGS.adminDash);
   } catch (err) {
     console.error('[registerStudent] Unexpected error:', err);
     return { error: 'Terjadi kesalahan saat mendaftar. Coba lagi.' };
@@ -86,6 +93,8 @@ export async function giveConsent(f: FormData) {
       console.error('[giveConsent] Supabase error:', error.message);
       redirect('/siswa?err=umum');
     }
+    invalidateTags(CACHE_TAGS.student(s.id), CACHE_TAGS.guruDash, CACHE_TAGS.adminDash);
+    await invalidateStudentSessionTag();
   } catch (err) {
     console.error('[giveConsent] Unexpected error:', err);
   }
@@ -99,6 +108,7 @@ export async function saveHabits(f: FormData) {
   try {
     await upsertPlan(s.id, { habits_done: done, habit_focus: HABIT_IDS.includes(focus) ? focus : '' });
     await markDay(s.id);
+    invalidateTags(CACHE_TAGS.student(s.id), CACHE_TAGS.guruDash, CACHE_TAGS.adminDash);
   } catch (err) {
     console.error('[saveHabits] Gagal menyimpan kebiasaan:', err);
     redirect('/siswa/kebiasaan?err=umum');
@@ -113,6 +123,7 @@ export async function saveGoal(f: FormData) {
   try {
     await upsertPlan(s.id, { goal });
     await markDay(s.id);
+    invalidateTags(CACHE_TAGS.student(s.id), CACHE_TAGS.adminDash);
   } catch (err) {
     console.error('[saveGoal] Gagal menyimpan tujuan:', err);
     redirect('/siswa/tujuan?err=umum');
@@ -127,6 +138,7 @@ export async function saveSchedule(f: FormData) {
   try {
     await upsertPlan(s.id, { sched_start: start, sched_topic: txt(f, 'topic', 60) });
     await markDay(s.id);
+    invalidateTags(CACHE_TAGS.student(s.id), CACHE_TAGS.adminDash);
   } catch (err) {
     console.error('[saveSchedule] Gagal menyimpan jadwal:', err);
     redirect('/siswa/waktu?err=umum');
@@ -139,6 +151,7 @@ export async function saveStrategies(f: FormData) {
   const picks = f.getAll('s').map(String).filter((x) => STRATEGY_IDS.includes(x));
   try {
     await upsertPlan(s.id, { strategies: picks });
+    invalidateTags(CACHE_TAGS.student(s.id), CACHE_TAGS.adminDash);
   } catch (err) {
     console.error('[saveStrategies] Gagal menyimpan strategi:', err);
     redirect('/siswa/strategi?err=umum');
@@ -152,6 +165,7 @@ export async function saveQuiz(score: number, total: number) {
   try {
     await admin().from('quiz_attempts').insert({ student_id: s.id, score, total });
     await markDay(s.id);
+    invalidateTags(CACHE_TAGS.student(s.id), CACHE_TAGS.guruDash, CACHE_TAGS.adminDash);
     revalidatePath('/siswa/strategi');
     revalidatePath('/siswa');
   } catch (err) {
@@ -168,6 +182,7 @@ export async function saveFocus(f: FormData) {
       focus_tools: txt(f, 'tools', 300),
     });
     await markDay(s.id);
+    invalidateTags(CACHE_TAGS.student(s.id), CACHE_TAGS.adminDash);
   } catch (err) {
     console.error('[saveFocus] Gagal menyimpan rencana fokus:', err);
     redirect('/siswa/fokus?err=umum');
@@ -193,6 +208,7 @@ export async function saveReflection(f: FormData) {
       redirect('/siswa/refleksi?err=umum');
     }
     await markDay(s.id);
+    invalidateTags(CACHE_TAGS.student(s.id), CACHE_TAGS.guruDash, CACHE_TAGS.adminDash);
   } catch (err) {
     console.error('[saveReflection] Unexpected error:', err);
     redirect('/siswa/refleksi?err=umum');
@@ -210,6 +226,8 @@ export async function saveShare(f: FormData) {
       console.error('[saveShare] Supabase error:', error.message);
       redirect('/siswa/bantuan?err=umum');
     }
+    invalidateTags(CACHE_TAGS.student(s.id), CACHE_TAGS.guruDash, CACHE_TAGS.adminDash);
+    await invalidateStudentSessionTag();
   } catch (err) {
     console.error('[saveShare] Unexpected error:', err);
     redirect('/siswa/bantuan?err=umum');
@@ -243,6 +261,8 @@ export async function requestConsult(f: FormData) {
         if (error) {
           console.error('[requestConsult] Supabase error:', error.message);
           errKey = 'umum';
+        } else {
+          invalidateTags(CACHE_TAGS.student(s.id), CACHE_TAGS.guruDash, CACHE_TAGS.adminDash);
         }
       }
     }
@@ -263,6 +283,8 @@ export async function deleteMyData() {
   const s = await me({ consent: false });
   try {
     await admin().from('students').delete().eq('id', s.id);
+    invalidateTags(CACHE_TAGS.students, CACHE_TAGS.student(s.id), CACHE_TAGS.guruDash, CACHE_TAGS.adminDash);
+    await invalidateStudentSessionTag();
   } catch (err) {
     console.error('[deleteMyData] Gagal menghapus data siswa:', err);
   }

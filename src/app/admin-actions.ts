@@ -7,6 +7,7 @@ import { randomBytes } from 'crypto';
 import { admin } from '@/lib/supabase-admin';
 import { supabaseAuth } from '@/lib/supabase-server';
 import { requireAdmin, PREVIEW_GURU_COOKIE, PREVIEW_STUDENT_COOKIE, signPreviewId, hash } from '@/lib/session';
+import { CACHE_TAGS, invalidateTags } from '@/lib/cache';
 import { STATUSES } from '@/lib/constants';
 import type { FormState } from './actions';
 
@@ -132,6 +133,7 @@ export async function createDemoStudent() {
           focus_place: 'Meja belajar di kamar',
           focus_tools: 'Buku catatan, latihan soal, air minum',
         });
+        invalidateTags(CACHE_TAGS.students, CACHE_TAGS.adminDash, CACHE_TAGS.guruDash);
       }
     }
   } catch (err) {
@@ -171,6 +173,7 @@ export async function saveContent(f: FormData) {
       const key = k.replace('content_', '');
       await sb.from('site_content').upsert({ key, value: String(v).trim(), updated_at: new Date().toISOString() });
     }
+    invalidateTags(CACHE_TAGS.siteContent, CACHE_TAGS.adminDash);
     revalidateTag('site-content');
     revalidatePath('/');
     revalidatePath('/siswa/strategi');
@@ -214,6 +217,7 @@ export async function addCounselor(_: FormState, f: FormData): Promise<FormState
       if (!codeErr) break;
     }
 
+    invalidateTags(CACHE_TAGS.counselors, CACHE_TAGS.roles, CACHE_TAGS.adminDash);
     revalidatePath('/admin');
   } catch (err) {
     console.error('[addCounselor] Unexpected error:', err);
@@ -235,6 +239,7 @@ export async function deleteCounselor(f: FormData) {
       await sb.from('school_codes').delete().in('code', codeList);
     }
     await sb.auth.admin.deleteUser(userId);
+    invalidateTags(CACHE_TAGS.counselors, CACHE_TAGS.roles, CACHE_TAGS.students, CACHE_TAGS.adminDash, CACHE_TAGS.guruDash, CACHE_TAGS.consultSlots);
     revalidatePath('/admin');
   } catch (err) {
     console.error('[deleteCounselor] Gagal menghapus guru BK:', err);
@@ -255,6 +260,7 @@ export async function adminNewCode(f: FormData) {
       const { error } = await admin().from('school_codes').insert({ code, owner_id: ownerId, note });
       if (!error) break;
     }
+    invalidateTags(CACHE_TAGS.adminDash, CACHE_TAGS.guruDash, CACHE_TAGS.guru(ownerId));
     revalidatePath('/admin');
     revalidatePath('/guru');
   } catch (err) {
@@ -271,6 +277,7 @@ export async function adminToggleCode(f: FormData) {
     const { data: c } = await sb.from('school_codes').select('active').eq('code', code).maybeSingle();
     if (!c) return;
     await sb.from('school_codes').update({ active: !c.active }).eq('code', code);
+    invalidateTags(CACHE_TAGS.adminDash, CACHE_TAGS.guruDash);
     revalidatePath('/admin');
     revalidatePath('/guru');
   } catch (err) {
@@ -286,6 +293,7 @@ export async function adminAddSlot(f: FormData) {
   if (!ownerId || !label) return;
   try {
     await admin().from('consult_slots').insert({ owner_id: ownerId, label, mode });
+    invalidateTags(CACHE_TAGS.consultSlots, CACHE_TAGS.adminDash, CACHE_TAGS.guruDash, CACHE_TAGS.guru(ownerId));
     revalidateTag('consult-slots');
     revalidatePath('/admin');
     revalidatePath('/guru');
@@ -304,6 +312,7 @@ export async function adminToggleSlot(f: FormData) {
     const { data: s } = await sb.from('consult_slots').select('active').eq('id', id).maybeSingle();
     if (!s) return;
     await sb.from('consult_slots').update({ active: !s.active }).eq('id', id);
+    invalidateTags(CACHE_TAGS.consultSlots, CACHE_TAGS.adminDash, CACHE_TAGS.guruDash);
     revalidateTag('consult-slots');
     revalidatePath('/admin');
     revalidatePath('/guru');
@@ -319,7 +328,12 @@ export async function adminSetRequestStatus(f: FormData) {
   const status = txt(f, 'status', 20);
   if (!id || !(STATUSES as readonly string[]).includes(status)) return;
   try {
-    await admin().from('consult_requests').update({ status }).eq('id', id);
+    const { data: reqRow } = await admin().from('consult_requests').update({ status }).eq('id', id).select('student_id').maybeSingle();
+    invalidateTags(
+      CACHE_TAGS.adminDash,
+      CACHE_TAGS.guruDash,
+      ...(reqRow?.student_id ? [CACHE_TAGS.student(reqRow.student_id)] : [])
+    );
     revalidatePath('/admin');
     revalidatePath('/guru');
     revalidatePath('/siswa/bantuan');
@@ -334,6 +348,7 @@ export async function deleteStudent(f: FormData) {
   if (!id) return;
   try {
     await admin().from('students').delete().eq('id', id);
+    invalidateTags(CACHE_TAGS.students, CACHE_TAGS.student(id), CACHE_TAGS.adminDash, CACHE_TAGS.guruDash);
     revalidatePath('/admin');
   } catch (err) {
     console.error('[deleteStudent] Gagal menghapus siswa:', err);
@@ -346,6 +361,7 @@ export async function deleteAllStudents(f: FormData) {
   if (!code) return;
   try {
     await admin().from('students').delete().eq('school_code', code);
+    invalidateTags(CACHE_TAGS.students, CACHE_TAGS.adminDash, CACHE_TAGS.guruDash);
     revalidatePath('/admin');
   } catch (err) {
     console.error('[deleteAllStudents] Gagal menghapus siswa per kode:', err);

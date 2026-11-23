@@ -1,8 +1,9 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link';
 import { requireGuru } from '@/lib/session';
-import { admin } from '@/lib/supabase-admin';
-import { BARRIER, CLASSES, STATUSES, QUIZ } from '@/lib/constants';import { todayJakarta } from '@/lib/util';
+import { guruDashboardData, type GuruTab } from '@/lib/data';
+import { getChatMessagesMap, type ChatMessage } from '@/lib/chat';
+import { BARRIER, CLASSES, STATUSES, QUIZ } from '@/lib/constants';
 import { logoutGuru, setRequestStatus, newCode, toggleCode, addSlot, toggleSlot, replyRequest } from '@/app/guru-actions';
 import { exitPreview } from '@/app/admin-actions';
 import Submit from '@/components/Submit';
@@ -15,43 +16,24 @@ type Refl = { student_id: string; r1: string; r2: string; r3: string; barrier: k
 export default async function Guru({ searchParams }: { searchParams: Promise<SP> }) {
   const g = await requireGuru();
   const sp = await searchParams;
-  const tab = sp.tab === 'konsul' || sp.tab === 'kode' || sp.tab === 'jadwal' ? sp.tab : 'siswa';
-  const sb = admin();
+  const tab: GuruTab = sp.tab === 'konsul' || sp.tab === 'kode' || sp.tab === 'jadwal' ? sp.tab : 'siswa';
 
-  let codes: Array<{ code: string; active: boolean; note: string }> = [];
-  let students: Array<{ id: string; nickname: string; class: string; share_summary: boolean; include_reflection: boolean; consent_at: string | null }> = [];
-  let reflData: Refl[] = [];
-  let quizData: Array<{ student_id: string; score: number; total: number }> = [];
-  let daysData: Array<{ student_id: string }> = [];
-  let requests: Array<{ id: string; student_id: string; slot_label: string; status: string; mode: string; room_info: string; reschedule_note: string; meet_link: string; confirmed_time: string }> = [];
-  let slotsData: Array<{ id: string; label: string; active: boolean; mode: string }> = [];
+  const {
+    codes,
+    students,
+    reflData,
+    quizData,
+    daysData,
+    requests,
+    slotsData,
+    baruCount,
+    reflectedCount,
+  } = await guruDashboardData(g.user_id, tab);
 
-  try {
-    const { data: codesRes } = await sb.from('school_codes').select('*').eq('owner_id', g.user_id).order('created_at', { ascending: false });
-    codes = (codesRes ?? []) as typeof codes;
-    const codeList = codes.map((c) => c.code);
-    const { data: studs } = codeList.length
-      ? await sb.from('students').select('id,nickname,class,share_summary,include_reflection,consent_at').in('school_code', codeList).order('created_at', { ascending: false })
-      : { data: [] as typeof students };
-    students = studs ?? [];
-    const ids = students.map((s) => s.id);
-    const monthStart = todayJakarta().slice(0, 8) + '01';
-
-    const [reflRes, quizRes, daysRes, reqRes, slotRes] = await Promise.all([
-      ids.length ? sb.from('reflections').select('student_id,r1,r2,r3,barrier,support_flag,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
-      ids.length ? sb.from('quiz_attempts').select('student_id,score,total,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
-      ids.length ? sb.from('practice_days').select('student_id,day').in('student_id', ids).gte('day', monthStart) : { data: [] },
-      ids.length ? sb.from('consult_requests').select('id,student_id,slot_label,status,mode,room_info,reschedule_note,meet_link,confirmed_time,created_at').in('student_id', ids).order('created_at', { ascending: false }) : { data: [] },
-      sb.from('consult_slots').select('id,label,active,mode').eq('owner_id', g.user_id).order('created_at'),
-    ]);
-    reflData = (reflRes.data ?? []) as Refl[];
-    quizData = (quizRes.data ?? []) as typeof quizData;
-    daysData = (daysRes.data ?? []) as typeof daysData;
-    requests = (reqRes.data ?? []) as typeof requests;
-    slotsData = (slotRes.data ?? []) as typeof slotsData;
-  } catch (err) {
-    console.error('[GuruPage] Gagal memuat data dashboard guru:', err);
-  }
+  const messagesByReq =
+    tab === 'konsul' && requests.length > 0
+      ? await getChatMessagesMap(requests.map((r) => r.id))
+      : new Map<string, ChatMessage[]>();
 
   const lastRefl = new Map<string, Refl>();
   for (const r of reflData) if (!lastRefl.has(r.student_id)) lastRefl.set(r.student_id, r);
@@ -61,8 +43,8 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
   for (const d of daysData) dayCount.set(d.student_id, (dayCount.get(d.student_id) ?? 0) + 1);
   const byId = new Map(students.map((s) => [s.id, s]));
 
-  const reflected = students.filter((s) => lastRefl.has(s.id)).length;
-  const baru = requests.filter((r) => r.status === 'Baru').length;
+  const reflected = reflectedCount;
+  const baru = baruCount;
   const alerts = students.filter((s) => s.share_summary && lastRefl.get(s.id)?.support_flag);
 
   const rows = students.filter((s) => {
@@ -179,7 +161,7 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
         {/* ── Tab navigation ── */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', borderBottom: '2px solid var(--line)', paddingBottom: 0 }}>
           {tabItems.map(([k, l]) => (
-            <Link key={k} href={`/guru?tab=${k}`} style={{
+            <Link key={k} href={`/guru?tab=${k}`} prefetch={true} style={{
               display: 'flex', alignItems: 'center', gap: 6,
               padding: '10px 20px',
               borderRadius: 'var(--r) var(--r) 0 0',
@@ -494,6 +476,7 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
                         slotLabel={r.slot_label}
                         status={r.status}
                         defaultOpen={requests.length === 1 || r.status !== 'Selesai'}
+                        initialMessages={messagesByReq.get(r.id) ?? []}
                       />
                     </div>
                   );

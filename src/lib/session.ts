@@ -1,10 +1,13 @@
 import 'server-only';
 import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createHash, createHmac, timingSafeEqual } from 'crypto';
 import { admin } from './supabase-admin';
 import { supabaseAuth } from './supabase-server';
+import { getVerifiedUserId } from './jwks';
+import { CACHE_TAGS, dbScope } from './cache';
 
 export const STUDENT_COOKIE = 'rsb_student';
 export const PREVIEW_STUDENT_COOKIE = 'rsb_preview_student';
@@ -44,32 +47,101 @@ export type Student = {
   is_admin_preview?: boolean;
 };
 
-// Dide-duplikasi otomatis per request dengan React cache()
+function cachedStudentByHash(scope: string, tokenHash: string) {
+  return unstable_cache(
+    async () => {
+      const { data, error } = await admin()
+        .from('students')
+        .select('id,nickname,class,school_code,consent_at,share_summary,include_reflection')
+        .eq('token_hash', tokenHash)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as Student | null) ?? null;
+    },
+    ['student-by-hash', scope, tokenHash],
+    { revalidate: 60, tags: [CACHE_TAGS.students, CACHE_TAGS.studentToken(tokenHash)] }
+  )();
+}
+
+function cachedStudentById(scope: string, id: string) {
+  return unstable_cache(
+    async () => {
+      const { data, error } = await admin()
+        .from('students')
+        .select('id,nickname,class,school_code,consent_at,share_summary,include_reflection')
+        .eq('id', id)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as Student | null) ?? null;
+    },
+    ['student-by-id', scope, id],
+    { revalidate: 60, tags: [CACHE_TAGS.students, CACHE_TAGS.student(id)] }
+  )();
+}
+
+function cachedCounselorById(scope: string, userId: string) {
+  return unstable_cache(
+    async () => {
+      const { data, error } = await admin()
+        .from('counselors')
+        .select('user_id,name,school_name')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as Guru | null) ?? null;
+    },
+    ['counselor-role', scope, userId],
+    { revalidate: 60, tags: [CACHE_TAGS.roles, CACHE_TAGS.counselors] }
+  )();
+}
+
+function cachedFirstCounselor(scope: string) {
+  return unstable_cache(
+    async () => {
+      const { data, error } = await admin()
+        .from('counselors')
+        .select('user_id,name,school_name')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as Guru | null) ?? null;
+    },
+    ['counselor-first', scope],
+    { revalidate: 60, tags: [CACHE_TAGS.roles, CACHE_TAGS.counselors] }
+  )();
+}
+
+function cachedAdminById(scope: string, userId: string) {
+  return unstable_cache(
+    async () => {
+      const { data, error } = await admin()
+        .from('admins')
+        .select('user_id,name')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as Admin | null) ?? null;
+    },
+    ['admin-role', scope, userId],
+    { revalidate: 60, tags: [CACHE_TAGS.roles] }
+  )();
+}
+
+// Dide-duplikasi otomatis per request dengan React cache() + Next Data Cache
 export const getStudent = cache(async (): Promise<Student | null> => {
   try {
     const store = await cookies();
+    const scope = dbScope();
     const previewId = verifyPreviewId(store.get(PREVIEW_STUDENT_COOKIE)?.value);
     if (previewId) {
-      const { data } = await admin()
-        .from('students')
-        .select('id,nickname,class,school_code,consent_at,share_summary,include_reflection')
-        .eq('id', previewId)
-        .maybeSingle();
-      if (data) return { ...(data as Student), is_admin_preview: true };
+      const data = await cachedStudentById(scope, previewId);
+      if (data) return { ...data, is_admin_preview: true };
     }
 
     const token = store.get(STUDENT_COOKIE)?.value;
     if (!token) return null;
-    const { data, error } = await admin()
-      .from('students')
-      .select('id,nickname,class,school_code,consent_at,share_summary,include_reflection')
-      .eq('token_hash', hash(token))
-      .maybeSingle();
-    if (error) {
-      console.error('[getStudent] Supabase error:', error.message);
-      return null;
-    }
-    return (data as Student | null) ?? null;
+    return await cachedStudentByHash(scope, hash(token));
   } catch (err) {
     console.error('[getStudent] Unexpected error:', err);
     return null;
@@ -88,44 +160,26 @@ export type Guru = { user_id: string; name: string; school_name: string; is_admi
 export const getGuru = cache(async (): Promise<Guru | null> => {
   try {
     const store = await cookies();
+    const scope = dbScope();
     // Fast-path: jika Admin sedang mode preview Guru (terverifikasi HMAC, 0 round-trip ke Auth)
     const previewGuruId = verifyPreviewId(store.get(PREVIEW_GURU_COOKIE)?.value);
     if (previewGuruId) {
-      const { data: cg } = await admin()
-        .from('counselors')
-        .select('user_id,name,school_name')
-        .eq('user_id', previewGuruId)
-        .maybeSingle();
-      if (cg) return { ...(cg as Guru), is_admin_preview: true };
+      const cg = await cachedCounselorById(scope, previewGuruId);
+      if (cg) return { ...cg, is_admin_preview: true };
     }
 
     const sb = await supabaseAuth();
-    const {
-      data: { user },
-      error: authErr,
-    } = await sb.auth.getUser();
-    if (authErr || !user) return null;
-    const { data, error } = await admin()
-      .from('counselors')
-      .select('user_id,name,school_name')
-      .eq('user_id', user.id)
-      .maybeSingle();
-    if (error) {
-      console.error('[getGuru] Supabase error:', error.message);
-      return null;
-    }
-    if (data) return data as Guru;
+    const userId = await getVerifiedUserId(sb, scope);
+    if (!userId) return null;
+
+    const guru = await cachedCounselorById(scope, userId);
+    if (guru) return guru;
 
     // Fallback jika Admin langsung membuka /guru tanpa memilih guru tertentu
-    const { data: adm } = await admin().from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
+    const adm = await cachedAdminById(scope, userId);
     if (adm) {
-      const { data: firstGuru } = await admin()
-        .from('counselors')
-        .select('user_id,name,school_name')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (firstGuru) return { ...(firstGuru as Guru), is_admin_preview: true };
+      const firstGuru = await cachedFirstCounselor(scope);
+      if (firstGuru) return { ...firstGuru, is_admin_preview: true };
     }
 
     return null;
@@ -149,12 +203,10 @@ export type Admin = { user_id: string; name: string };
 export const getAdmin = cache(async (): Promise<Admin | null> => {
   try {
     const sb = await supabaseAuth();
-    const {
-      data: { user },
-    } = await sb.auth.getUser();
-    if (!user) return null;
-    const { data } = await admin().from('admins').select('user_id,name').eq('user_id', user.id).maybeSingle();
-    return (data as Admin | null) ?? null;
+    const scope = dbScope();
+    const userId = await getVerifiedUserId(sb, scope);
+    if (!userId) return null;
+    return await cachedAdminById(scope, userId);
   } catch {
     return null;
   }
