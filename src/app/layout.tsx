@@ -5,15 +5,17 @@ import './globals.css';
 const fontDisplay = Bricolage_Grotesque({
   subsets: ['latin'],
   weight: ['600', '700', '800'],
-  display: 'swap',
+  display: 'optional',
   variable: '--fd',
+  preload: false,
 });
 
 const fontBody = Source_Sans_3({
   subsets: ['latin'],
   weight: ['400', '600', '700'],
-  display: 'swap',
+  display: 'optional',
   variable: '--fb',
+  preload: false,
 });
 
 export const metadata: Metadata = {
