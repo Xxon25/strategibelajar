@@ -2,8 +2,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link';
 import { requireGuru } from '@/lib/session';
 import { admin } from '@/lib/supabase-admin';
-import { BARRIER, CLASSES, STATUSES, QUIZ } from '@/lib/constants';
-import { todayJakarta } from '@/lib/util';
+import { BARRIER, CLASSES, STATUSES, QUIZ } from '@/lib/constants';import { todayJakarta } from '@/lib/util';
 import { logoutGuru, setRequestStatus, newCode, toggleCode, addSlot, toggleSlot, replyRequest } from '@/app/guru-actions';
 import { exitPreview } from '@/app/admin-actions';
 import Submit from '@/components/Submit';
@@ -343,7 +342,25 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
                             {s && <div style={{ fontSize: 12, color: 'var(--muted)' }}>Kelas {s.class}</div>}
                           </div>
                         </div>
-                        <span className={'chip' + (r.status === 'Baru' ? ' warn' : r.status === 'Selesai' ? ' ok' : '')}>{r.status}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span className={'chip' + (r.status === 'Baru' ? ' warn' : r.status === 'Selesai' ? ' ok' : '')}>{r.status}</span>
+                          <Link
+                            href={`/guru/chat/${r.id}`}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: 5,
+                              padding: '6px 12px', borderRadius: 8,
+                              background: '#e8f7f5', color: '#2a9d8f',
+                              border: '1.5px solid #c0eae5',
+                              fontWeight: 700, fontSize: 12, textDecoration: 'none',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Chat
+                          </Link>
+                        </div>
                       </div>
 
                       {/* Info jadwal */}

@@ -1,22 +1,19 @@
 export const dynamic = 'force-dynamic'
+import Link from 'next/link';
 import { requireStudent } from '@/lib/session';
 import { studentData, slotsForCode } from '@/lib/data';
-import { getChatMessages } from '@/lib/chat';
 import { saveShare, requestConsult, logoutStudent, deleteMyData } from '@/app/actions';
 import { BARRIER } from '@/lib/constants';
 import { monthInfo } from '@/lib/util';
 import Submit from '@/components/Submit';
 import Flash from '@/components/Flash';
-import ConsultChat from '@/components/ConsultChat';
 
 export default async function Bantuan({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string }> }) {
   const s = await requireStudent();
-  const [sp, d, slots] = await Promise.all([searchParams, studentData(s.id), slotsForCode(s.school_code)]);
+  const sp = await searchParams;
+  const [d, slots] = await Promise.all([studentData(s.id), slotsForCode(s.school_code)]);
   const last = d.reflections[0];
   const n = monthInfo(d.days).n;
-  // Ambil sesi konsultasi yang sedang aktif (belum Selesai), atau sesi konsultasi terakhir jika semuanya sudah selesai
-  const activeReq = d.requests.find((r) => r.status !== 'Selesai') ?? d.requests[0] ?? null;
-  const initialMessages = activeReq ? await getChatMessages(activeReq.id) : [];
 
   const onlineSlots = slots.filter((sl) => sl.mode === 'online');
   const offlineSlots = slots.filter((sl) => sl.mode === 'offline');
@@ -32,31 +29,6 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
       </div>
 
       <Flash ok={sp.ok} err={sp.err} />
-
-      {/* ── LIVE CHAT KONSULTASI (Muncul otomatis jika siswa sudah mengajukan jadwal konsultasi) ── */}
-      {activeReq && (
-        <div className="card" style={{ borderTop: '4px solid var(--accent)', gap: 12 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-            <div>
-              <span className="eyebrow">💬 Konsultasi Terhubung</span>
-              <h3 style={{ margin: 0, fontSize: 18 }}>Live Chat dengan Guru BK</h3>
-            </div>
-            <span className={'chip' + (activeReq.status === 'Baru' ? ' warn' : activeReq.status === 'Selesai' ? ' ok' : '')}>
-              Status Jadwal: {activeReq.status}
-            </span>
-          </div>
-          <ConsultChat
-            requestId={activeReq.id}
-            viewerRole="siswa"
-            viewerName={s.nickname}
-            partnerLabel="Guru BK"
-            slotLabel={activeReq.slot_label}
-            status={activeReq.status}
-            defaultOpen={true}
-            initialMessages={initialMessages}
-          />
-        </div>
-      )}
 
       {/* Layout 2 kolom di desktop */}
       <style>{`@media(min-width:860px){.bantuan-layout{display:grid!important;grid-template-columns:1fr 1fr;gap:20px;align-items:start}}`}</style>
@@ -214,9 +186,26 @@ export default async function Bantuan({ searchParams }: { searchParams: Promise<
                           </span>
                           <span style={{ fontWeight: 600, fontSize: 14 }}>{r.slot_label}</span>
                         </div>
-                        <span className={'chip' + (r.status === 'Baru' ? ' warn' : r.status === 'Selesai' ? ' ok' : '')}>{r.status}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span className={'chip' + (r.status === 'Baru' ? ' warn' : r.status === 'Selesai' ? ' ok' : '')}>{r.status}</span>
+                          <Link
+                            href={`/siswa/chat/${r.id}`}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: 5,
+                              padding: '5px 12px', borderRadius: 8,
+                              background: 'var(--tint)', color: 'var(--accent)',
+                              border: '1.5px solid var(--tint2)',
+                              fontWeight: 700, fontSize: 12, textDecoration: 'none',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Chat
+                          </Link>
+                        </div>
                       </div>
-
                       {/* Balasan guru BK */}
                       {hasReply && (
                         <div style={{
