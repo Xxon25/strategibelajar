@@ -20,7 +20,13 @@ export default function AdminMasuk() {
               background: 'linear-gradient(135deg,#4f46e5,#7c3aed)',
               display: 'grid', placeItems: 'center',
               marginBottom: '16px',
-            }} />
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
+                <path d="M19 11l2 2-4 4"/>
+              </svg>
+            </div>
             <span className="eyebrow">Super Admin</span>
             <h2 style={{ fontSize: '22px', fontWeight: 800, marginTop: 4 }}>Masuk ke Panel Admin</h2>
           </div>

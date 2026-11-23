@@ -187,48 +187,53 @@ alter table practice_days enable row level security;
 -- ─────────────────────────────────────────────
 do $$
 declare
-  v_admin_id uuid := gen_random_uuid();
+  v_admin_id uuid;
 begin
-  -- Insert ke auth.users langsung
-  insert into auth.users (
-    id, instance_id, aud, role,
-    email, encrypted_password,
-    email_confirmed_at, created_at, updated_at,
-    raw_app_meta_data, raw_user_meta_data,
-    is_super_admin, confirmation_token, recovery_token,
-    email_change_token_new, email_change
-  ) values (
-    v_admin_id,
-    '00000000-0000-0000-0000-000000000000',
-    'authenticated', 'authenticated',
-    'contoh@admin.id',
-    crypt('admin1234', gen_salt('bf')),
-    now(), now(), now(),
-    '{"provider":"email","providers":["email"]}',
-    '{"name":"Super Admin"}',
-    false, '', '', '', ''
-  )
-  on conflict (email) do nothing;
+  -- Cek apakah email sudah ada
+  select id into v_admin_id
+  from auth.users
+  where email = 'contoh@admin.id'
+  limit 1;
 
-  -- Insert ke tabel admins (hanya jika user berhasil dibuat)
+  -- Kalau belum ada, buat baru
+  if v_admin_id is null then
+    v_admin_id := gen_random_uuid();
+
+    insert into auth.users (
+      id, instance_id, aud, role,
+      email, encrypted_password,
+      email_confirmed_at, created_at, updated_at,
+      raw_app_meta_data, raw_user_meta_data,
+      is_super_admin, confirmation_token, recovery_token,
+      email_change_token_new, email_change
+    ) values (
+      v_admin_id,
+      '00000000-0000-0000-0000-000000000000',
+      'authenticated', 'authenticated',
+      'contoh@admin.id',
+      crypt('admin1234', gen_salt('bf')),
+      now(), now(), now(),
+      '{"provider":"email","providers":["email"]}',
+      '{"name":"Super Admin"}',
+      false, '', '', '', ''
+    );
+
+    -- Insert ke auth.identities (wajib agar bisa login)
+    insert into auth.identities (
+      id, user_id, provider_id, provider,
+      identity_data, last_sign_in_at, created_at, updated_at
+    ) values (
+      gen_random_uuid(),
+      v_admin_id,
+      'contoh@admin.id',
+      'email',
+      jsonb_build_object('sub', v_admin_id::text, 'email', 'contoh@admin.id'),
+      now(), now(), now()
+    );
+  end if;
+
+  -- Insert ke tabel admins
   insert into admins (user_id, name)
-  select v_admin_id, 'Super Admin'
-  where exists (
-    select 1 from auth.users where id = v_admin_id
-  )
+  values (v_admin_id, 'Super Admin')
   on conflict (user_id) do nothing;
-
-  -- Insert ke auth.identities (wajib agar bisa login)
-  insert into auth.identities (
-    id, user_id, provider_id, provider,
-    identity_data, last_sign_in_at, created_at, updated_at
-  ) values (
-    gen_random_uuid(),
-    v_admin_id,
-    'contoh@admin.id',
-    'email',
-    jsonb_build_object('sub', v_admin_id::text, 'email', 'contoh@admin.id'),
-    now(), now(), now()
-  )
-  on conflict do nothing;
 end $$;
