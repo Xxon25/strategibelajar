@@ -68,13 +68,18 @@ export default function ConsultChat({
       const data = (await res.json()) as { messages?: ChatMsg[] };
       if (Array.isArray(data.messages)) {
         setMessages((prev) => {
+          const pending = prev.filter((m) => m.pending);
+          const committed = prev.filter((m) => !m.pending);
           if (
-            prev.length === data.messages!.length &&
-            prev[prev.length - 1]?.id === data.messages![data.messages!.length - 1]?.id
+            pending.length === 0 &&
+            committed.length === data.messages!.length &&
+            committed[committed.length - 1]?.id === data.messages![data.messages!.length - 1]?.id
           ) {
             return prev;
           }
-          return data.messages!;
+          const serverKeys = new Set(data.messages!.map((m) => `${m.sender_role}|${m.message}`));
+          const remaining = pending.filter((p) => !serverKeys.has(`${p.sender_role}|${p.message}`));
+          return [...data.messages!, ...remaining];
         });
         setLoadedOnce(true);
       }
@@ -86,12 +91,22 @@ export default function ConsultChat({
   useEffect(() => {
     if (!open) return;
     void fetchMessages();
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void fetchMessages();
+    };
+    const onFocus = () => void fetchMessages();
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onFocus);
     const timer = setInterval(() => {
       if (document.visibilityState === 'visible') {
         void fetchMessages();
       }
-    }, 3500);
-    return () => clearInterval(timer);
+    }, 2000);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onFocus);
+    };
   }, [open, fetchMessages]);
 
   useEffect(() => {

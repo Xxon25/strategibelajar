@@ -8,16 +8,24 @@ import { appendChatMessage, getChatMessages } from '@/lib/chat';
 const txt = (f: FormData, k: string, max: number) =>
   String(f.get(k) ?? '').trim().slice(0, max);
 
-const isMissingTable = (err: { code?: string } | null) =>
-  err?.code === 'PGRST205' || err?.code === '42P01';
+export type ChatActionResult = {
+  ok?: boolean;
+  error?: string;
+  message?: {
+    id: string;
+    sender_role: 'student' | 'counselor';
+    body: string;
+    created_at: string;
+  };
+};
 
-/** Siswa mengirim pesan */
-export async function sendStudentMessage(f: FormData) {
+/** Siswa mengirim pesan (disimpan ke consult_messages agar sinkron dengan live chat Guru BK) */
+export async function sendStudentMessage(f: FormData): Promise<ChatActionResult> {
   const s = await getStudent();
   if (!s) return { error: 'Sesi tidak ditemukan.' };
 
   const requestId = txt(f, 'request_id', 60);
-  const body = txt(f, 'body', 2000);
+  const body = txt(f, 'body', 1000);
   if (!body) return { error: 'Pesan tidak boleh kosong.' };
 
   try {
@@ -31,37 +39,37 @@ export async function sendStudentMessage(f: FormData) {
       .maybeSingle();
     if (!req) return { error: 'Permintaan tidak ditemukan.' };
 
-    const { error } = await sb
-      .from('chat_messages')
-      .insert({ request_id: requestId, sender_role: 'student', body });
-    if (error) {
-      if (isMissingTable(error)) {
-        const saved = await appendChatMessage({
-          requestId,
-          senderRole: 'siswa',
-          senderName: s.nickname,
-          message: body,
-        });
-        if (!saved) return { error: 'Gagal mengirim pesan.' };
-      } else {
-        return { error: 'Gagal mengirim pesan.' };
-      }
-    }
+    const saved = await appendChatMessage({
+      requestId,
+      senderRole: 'siswa',
+      senderName: s.nickname,
+      message: body,
+    });
+    if (!saved) return { error: 'Gagal mengirim pesan.' };
 
     revalidatePath(`/siswa/chat/${requestId}`);
-    return { ok: true };
-  } catch {
+    return {
+      ok: true,
+      message: {
+        id: saved.id,
+        sender_role: 'student',
+        body: saved.message,
+        created_at: saved.created_at,
+      },
+    };
+  } catch (err) {
+    console.error('[sendStudentMessage] Error:', err);
     return { error: 'Terjadi kesalahan.' };
   }
 }
 
-/** Guru BK mengirim pesan */
-export async function sendGuruMessage(f: FormData) {
+/** Guru BK mengirim pesan (disimpan ke consult_messages agar sinkron dengan live chat Siswa) */
+export async function sendGuruMessage(f: FormData): Promise<ChatActionResult> {
   const g = await getGuru();
   if (!g) return { error: 'Sesi guru tidak ditemukan.' };
 
   const requestId = txt(f, 'request_id', 60);
-  const body = txt(f, 'body', 2000);
+  const body = txt(f, 'body', 1000);
   if (!body) return { error: 'Pesan tidak boleh kosong.' };
 
   try {
@@ -89,57 +97,40 @@ export async function sendGuruMessage(f: FormData) {
       .maybeSingle();
     if (!code) return { error: 'Akses ditolak.' };
 
-    const { error } = await sb
-      .from('chat_messages')
-      .insert({ request_id: requestId, sender_role: 'counselor', body });
-    if (error) {
-      if (isMissingTable(error)) {
-        const saved = await appendChatMessage({
-          requestId,
-          senderRole: 'guru',
-          senderName: g.name,
-          message: body,
-        });
-        if (!saved) return { error: 'Gagal mengirim pesan.' };
-      } else {
-        return { error: 'Gagal mengirim pesan.' };
-      }
-    }
+    const saved = await appendChatMessage({
+      requestId,
+      senderRole: 'guru',
+      senderName: g.name,
+      message: body,
+    });
+    if (!saved) return { error: 'Gagal mengirim pesan.' };
 
     revalidatePath(`/guru/chat/${requestId}`);
-    return { ok: true };
-  } catch {
+    return {
+      ok: true,
+      message: {
+        id: saved.id,
+        sender_role: 'counselor',
+        body: saved.message,
+        created_at: saved.created_at,
+      },
+    };
+  } catch (err) {
+    console.error('[sendGuruMessage] Error:', err);
     return { error: 'Terjadi kesalahan.' };
   }
 }
 
-/** Ambil semua pesan untuk satu request (server-side, untuk SSR awal) */
+/** Ambil semua pesan untuk satu request dari consult_messages (server-side, untuk SSR awal) */
 export async function getMessages(requestId: string) {
   try {
-    const { data, error } = await admin()
-      .from('chat_messages')
-      .select('id, sender_role, body, created_at')
-      .eq('request_id', requestId)
-      .order('created_at', { ascending: true })
-      .limit(200);
-    if (!error) {
-      return (data ?? []) as Array<{
-        id: string;
-        sender_role: 'student' | 'counselor';
-        body: string;
-        created_at: string;
-      }>;
-    }
-    if (isMissingTable(error)) {
-      const msgs = await getChatMessages(requestId);
-      return msgs.map((m) => ({
-        id: m.id,
-        sender_role: (m.sender_role === 'guru' ? 'counselor' : 'student') as 'student' | 'counselor',
-        body: m.message,
-        created_at: m.created_at,
-      }));
-    }
-    return [];
+    const msgs = await getChatMessages(requestId);
+    return msgs.map((m) => ({
+      id: m.id,
+      sender_role: (m.sender_role === 'guru' ? 'counselor' : 'student') as 'student' | 'counselor',
+      body: m.message,
+      created_at: m.created_at,
+    }));
   } catch {
     return [];
   }

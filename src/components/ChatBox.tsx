@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition } from 'react';
-import { getSupabaseBrowser } from '@/lib/supabase-client';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 
 type Message = {
   id: string;
@@ -14,7 +13,7 @@ type Props = {
   requestId: string;
   myRole: 'student' | 'counselor';
   initialMessages: Message[];
-  sendAction: (f: FormData) => Promise<{ ok?: boolean; error?: string }>;
+  sendAction: (f: FormData) => Promise<{ ok?: boolean; error?: string; message?: Message }>;
   /** Label nama untuk role lawan — ditampilkan di bubble */
   otherLabel: string;
   myLabel: string;
@@ -40,70 +39,57 @@ export default function ChatBox({
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  /* ── Supabase Realtime subscribe ── */
-  useEffect(() => {
-    const sb = getSupabaseBrowser();
-    const channel = sb
-      .channel(`chat:${requestId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'chat_messages',
-          filter: `request_id=eq.${requestId}`,
-        },
-        (payload) => {
-          const msg = payload.new as Message;
-          setMessages((prev) => {
-            // Hindari duplikat
-            if (prev.some((m) => m.id === msg.id)) return prev;
-            return [...prev, msg];
-          });
-        },
-      )
-      .subscribe();
-
-    return () => {
-      sb.removeChannel(channel);
-    };
-  }, [requestId]);
-
-  /* ── Sync fallback via /api/chat saat tab aktif (jika tabel chat_messages / Realtime belum aktif) ── */
-  useEffect(() => {
+  /* ── Sync real-time via /api/chat (consult_messages) saat tab aktif ── */
+  const syncMessages = useCallback(async () => {
     const asRole = myRole === 'counselor' ? 'guru' : 'siswa';
-    const sync = async () => {
-      if (document.visibilityState !== 'visible') return;
-      try {
-        const res = await fetch(`/api/chat?requestId=${encodeURIComponent(requestId)}&as=${asRole}`, { cache: 'no-store' });
-        if (!res.ok) return;
-        const json = (await res.json()) as {
-          messages?: Array<{ id: string; sender_role: 'siswa' | 'guru'; message: string; created_at: string }>;
-        };
-        if (!Array.isArray(json.messages) || json.messages.length === 0) return;
-        const mapped: Message[] = json.messages.map((m) => ({
-          id: m.id,
-          sender_role: m.sender_role === 'guru' ? 'counselor' : 'student',
-          body: m.message,
-          created_at: m.created_at,
-        }));
-        setMessages((prev) => {
-          const pendingOpts = prev.filter((p) => p.id.startsWith('opt-'));
-          const seen = new Set(prev.filter((p) => !p.id.startsWith('opt-')).map((p) => p.id));
-          if (mapped.every((m) => seen.has(m.id)) && prev.length - pendingOpts.length === mapped.length) {
-            return prev;
-          }
-          const serverBodies = new Set(mapped.map((m) => `${m.sender_role}|${m.body}`));
-          const remainingOpts = pendingOpts.filter((p) => !serverBodies.has(`${p.sender_role}|${p.body}`));
-          return [...mapped, ...remainingOpts];
-        });
-      } catch {
-        /* abaikan error jaringan sementara */
-      }
-    };
-    const id = setInterval(sync, 3500);
-    return () => clearInterval(id);
+    try {
+      const res = await fetch(`/api/chat?requestId=${encodeURIComponent(requestId)}&as=${asRole}`, { cache: 'no-store' });
+      if (!res.ok) return;
+      const json = (await res.json()) as {
+        messages?: Array<{ id: string; sender_role: 'siswa' | 'guru'; message: string; created_at: string }>;
+      };
+      if (!Array.isArray(json.messages)) return;
+      const mapped: Message[] = json.messages.map((m) => ({
+        id: m.id,
+        sender_role: m.sender_role === 'guru' ? 'counselor' : 'student',
+        body: m.message,
+        created_at: m.created_at,
+      }));
+      setMessages((prev) => {
+        const pendingOpts = prev.filter((p) => p.id.startsWith('opt-'));
+        const committed = prev.filter((p) => !p.id.startsWith('opt-'));
+        if (
+          committed.length === mapped.length &&
+          committed.every((m, idx) => m.id === mapped[idx]?.id)
+        ) {
+          return prev;
+        }
+        const serverKeys = new Set(mapped.map((m) => `${m.sender_role}|${m.body}`));
+        const remainingOpts = pendingOpts.filter((p) => !serverKeys.has(`${p.sender_role}|${p.body}`));
+        return [...mapped, ...remainingOpts];
+      });
+    } catch {
+      /* abaikan error jaringan sementara */
+    }
   }, [requestId, myRole]);
+
+  useEffect(() => {
+    void syncMessages();
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void syncMessages();
+    };
+    const onFocus = () => void syncMessages();
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onFocus);
+    const id = setInterval(() => {
+      if (document.visibilityState === 'visible') void syncMessages();
+    }, 2000);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [syncMessages]);
 
   /* ── Kirim pesan ── */
   function handleSend() {
@@ -123,14 +109,26 @@ export default function ChatBox({
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
 
     startTransition(async () => {
-      const fd = new FormData();
-      fd.set('request_id', requestId);
-      fd.set('body', body);
-      const res = await sendAction(fd);
-      if (res?.error) {
-        // Rollback optimistic
+      try {
+        const fd = new FormData();
+        fd.set('request_id', requestId);
+        fd.set('body', body);
+        const res = await sendAction(fd);
+        if (res?.error) {
+          setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
+          setErr(res.error);
+          return;
+        }
+        if (res?.message) {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === optimistic.id ? res.message! : m)),
+          );
+        } else {
+          void syncMessages();
+        }
+      } catch {
         setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
-        setErr(res.error);
+        setErr('Gagal mengirim pesan. Coba lagi.');
       }
     });
   }
