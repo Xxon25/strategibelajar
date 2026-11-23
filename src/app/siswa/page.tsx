@@ -404,6 +404,9 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--tint)', display: 'grid', placeItems: 'center' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
           </div>
           <div>
             <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--ink2)' }}>Ingin berdiskusi langsung dengan Guru BK?</div>

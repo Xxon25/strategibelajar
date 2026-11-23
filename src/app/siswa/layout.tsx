@@ -53,7 +53,11 @@ export default async function SiswaLayout({ children }: { children: React.ReactN
             width: 36, height: 36, borderRadius: 11, flexShrink: 0,
             background: 'var(--grad)', display: 'grid', placeItems: 'center',
             fontSize: 18, boxShadow: '0 4px 10px rgba(232,82,74,.28)',
-          }} />
+          }}>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
           <div>
             <div style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 15, color: 'var(--ink2)', lineHeight: 1.1 }}>
               Ruang Strategi Belajar

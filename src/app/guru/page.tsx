@@ -125,7 +125,11 @@ export default async function Guru({ searchParams }: { searchParams: Promise<SP>
         boxShadow: 'var(--shadow-sm)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--grad)', display: 'grid', placeItems: 'center', fontSize: 16, boxShadow: '0 2px 8px rgba(232,82,74,.3)' }} />
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--grad)', display: 'grid', placeItems: 'center', fontSize: 16, boxShadow: '0 2px 8px rgba(232,82,74,.3)' }}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
           <span style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: 15, color: 'var(--accent)' }}>Ruang Strategi Belajar</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

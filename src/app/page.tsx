@@ -41,7 +41,11 @@ export default async function Masuk({ searchParams }: { searchParams: Promise<{ 
             width: '32px', height: '32px', borderRadius: '10px',
             background: 'var(--grad)', display: 'grid', placeItems: 'center',
             fontSize: '16px', flexShrink: 0,
-          }} />
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
           <span style={{ fontFamily: 'var(--fd)', fontWeight: 800, fontSize: '16px', color: 'var(--ink2)' }}>
             {c.home_title}
           </span>
@@ -126,7 +130,11 @@ export default async function Masuk({ searchParams }: { searchParams: Promise<{ 
             {s ? (
               <Link className="item" href="/siswa">
                 <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#e8524a,#c73b35)', display: 'grid', placeItems: 'center' }} />
+                  <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#e8524a,#c73b35)', display: 'grid', placeItems: 'center' }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </span>
                   <span>
                     <span className="t">Lanjutkan sebagai {s.nickname}</span>
                     <span className="d">Kelas {s.class} · perangkat ini</span>
@@ -137,7 +145,11 @@ export default async function Masuk({ searchParams }: { searchParams: Promise<{ 
             ) : (
               <Link className="item" href="/daftar">
                 <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#e8524a,#c73b35)', display: 'grid', placeItems: 'center' }} />
+                  <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#e8524a,#c73b35)', display: 'grid', placeItems: 'center' }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </span>
                   <span>
                     <span className="t">Masuk sebagai Siswa</span>
                     <span className="d">Daftar dengan nama panggilan &amp; kode sekolah</span>
@@ -149,7 +161,12 @@ export default async function Masuk({ searchParams }: { searchParams: Promise<{ 
 
             <Link className="item" href="/guru/masuk">
               <span style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#0e9f8a,#0a7a68)', display: 'grid', placeItems: 'center' }} />
+                <span style={{ width: '48px', height: '48px', borderRadius: '14px', flexShrink: 0, background: 'linear-gradient(135deg,#0e9f8a,#0a7a68)', display: 'grid', placeItems: 'center' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </span>
                 <span>
                   <span className="t">Masuk sebagai Guru BK</span>
                   <span className="d">Khusus guru BK · email &amp; kata sandi</span>
